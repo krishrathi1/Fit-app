@@ -13,6 +13,9 @@ function Icon({ name }) {
   const icons = {
     arrow: <path {...common} d="M15.5 4.5 8 12l7.5 7.5" strokeWidth="2.8" />,
     check: <path {...common} d="m4.5 12.5 5 5 10-11" strokeWidth="3" />,
+    plus: <path {...common} d="M12 5v14M5 12h14" strokeWidth="2.4" />,
+    search: <path {...common} d="m18.5 18.5-3.8-3.8M10.8 17a6.2 6.2 0 1 1 0-12.4 6.2 6.2 0 0 1 0 12.4Z" />,
+    flash: <path {...common} d="M13 2.8 7.7 12h3.8L10.9 21l5.4-9.2h-3.8L13 2.8Z" strokeWidth="2.2" />,
     energy: (
       <path
         {...common}
@@ -134,26 +137,96 @@ const macroPresets = {
   energy: { protein: 0.3, carbs: 0.42, fats: 0.28 },
 }
 
-const mealSections = [
+const mealSectionsSeed = [
   {
+    id: 'breakfast',
     title: 'Breakfast',
     items: [
-      { name: 'Greek Yogurt Bowl', amount: '220g', calories: 247, protein: 28, carbs: 18, fats: 7 },
-      { name: 'Protein Oats', amount: '1 bowl', calories: 318, protein: 24, carbs: 42, fats: 6 },
+      { id: 'meal-breakfast-avocado', name: 'Avocado Toast with Egg', amount: '1 slice', calories: 340, protein: 22, carbs: 28, fats: 16, fiber: 8, sodium: 450, detailFoodId: 'avocado-toast-egg' },
+      { id: 'meal-breakfast-yogurt', name: 'Greek Yogurt Bowl', amount: '220g', calories: 247, protein: 28, carbs: 18, fats: 7 },
     ],
   },
   {
+    id: 'lunch',
     title: 'Lunch',
-    items: [{ name: 'Grilled Chicken Plate', amount: '150g', calories: 412, protein: 46, carbs: 22, fats: 12 }],
+    items: [{ id: 'meal-lunch-chicken', name: 'Grilled Chicken Plate', amount: '150g', calories: 412, protein: 46, carbs: 22, fats: 12 }],
   },
   {
+    id: 'dinner',
     title: 'Dinner',
-    items: [{ name: 'Salmon & Greens', amount: '1 plate', calories: 486, protein: 38, carbs: 19, fats: 24 }],
+    items: [{ id: 'meal-dinner-salmon', name: 'Salmon & Greens', amount: '1 plate', calories: 486, protein: 38, carbs: 19, fats: 24 }],
   },
   {
+    id: 'snacks',
     title: 'Snacks',
-    items: [{ name: 'Apple + Peanut Butter', amount: '1 serving', calories: 210, protein: 6, carbs: 24, fats: 10 }],
+    items: [{ id: 'meal-snacks-apple', name: 'Apple + Peanut Butter', amount: '1 serving', calories: 210, protein: 6, carbs: 24, fats: 10 }],
   },
+]
+
+const addFoodTabs = [
+  { id: 'recent', label: 'Recent' },
+  { id: 'frequent', label: 'Frequent' },
+  { id: 'saved', label: 'Saved Meals' },
+  { id: 'recipes', label: 'Recipes' },
+]
+
+const addFoodLibrary = {
+  recent: [
+    { id: 'oatmeal', name: 'Oatmeal', amount: '1 bowl', calories: 190, protein: 6, carbs: 33, fats: 4 },
+    { id: 'scrambled-eggs', name: 'Scrambled Eggs', amount: '2 eggs', calories: 180, protein: 13, carbs: 2, fats: 13 },
+    { id: 'chicken-breast', name: 'Chicken Breast', amount: '150g', calories: 247, protein: 46, carbs: 0, fats: 5 },
+    { id: 'brown-rice', name: 'Brown Rice', amount: '140g', calories: 168, protein: 4, carbs: 35, fats: 1 },
+    { id: 'apple', name: 'Apple', amount: '1 medium', calories: 95, protein: 0, carbs: 25, fats: 0 },
+    { id: 'almonds', name: 'Almonds', amount: '28g', calories: 164, protein: 6, carbs: 6, fats: 14 },
+  ],
+  frequent: [
+    { id: 'greek-yogurt', name: 'Greek Yogurt Bowl', amount: '220g', calories: 247, protein: 28, carbs: 18, fats: 7 },
+    { id: 'protein-oats', name: 'Protein Oats', amount: '1 bowl', calories: 318, protein: 24, carbs: 42, fats: 6 },
+    { id: 'salmon-greens', name: 'Salmon & Greens', amount: '1 plate', calories: 486, protein: 38, carbs: 19, fats: 24 },
+  ],
+  saved: [
+    { id: 'avocado-toast-egg', name: 'Avocado Toast with Egg', amount: '1 slice', calories: 340, protein: 22, carbs: 28, fats: 16, fiber: 8, sodium: 450, detailFoodId: 'avocado-toast-egg' },
+    { id: 'high-protein-wrap', name: 'High Protein Wrap', amount: '1 wrap', calories: 410, protein: 32, carbs: 28, fats: 18 },
+    { id: 'recovery-smoothie', name: 'Recovery Smoothie', amount: '420ml', calories: 280, protein: 24, carbs: 30, fats: 7 },
+  ],
+  recipes: [
+    { id: 'mediterranean-bowl', name: 'Mediterranean Bowl', amount: '1 bowl', calories: 430, protein: 21, carbs: 42, fats: 18 },
+    { id: 'turkey-chili', name: 'Turkey Chili', amount: '1 serving', calories: 360, protein: 29, carbs: 24, fats: 15 },
+    { id: 'veg-power-salad', name: 'Veg Power Salad', amount: '1 bowl', calories: 290, protein: 12, carbs: 26, fats: 15 },
+  ],
+}
+
+const foodDetails = {
+  'avocado-toast-egg': {
+    id: 'avocado-toast-egg',
+    name: 'Avocado Toast with Egg',
+    art: 'toast',
+    insight: 'This will hit 100% of your daily fiber goal.',
+    portions: [
+      { id: 'half-slice', label: 'Half Slice', amount: '1/2 slice', calories: 170, protein: 11, carbs: 14, fats: 8, fiber: 4, iron: 2, sodium: 225 },
+      { id: 'hundred-grams', label: '100g', amount: '100g', calories: 318, protein: 20, carbs: 26, fats: 15, fiber: 7, iron: 3, sodium: 410 },
+      { id: 'one-slice', label: '1 Slice', amount: '1 slice', calories: 340, protein: 22, carbs: 28, fats: 16, fiber: 8, iron: 3, sodium: 450 },
+      { id: 'custom', label: 'Custom', amount: '1.25 slice', calories: 386, protein: 25, carbs: 31, fats: 18, fiber: 9, iron: 4, sodium: 500 },
+    ],
+  },
+  'cinnamon-oat-bar': {
+    id: 'cinnamon-oat-bar',
+    name: 'Cinnamon Oat Bar',
+    art: 'bar',
+    insight: 'A fast carb top-up with enough fiber to keep it steady.',
+    portions: [
+      { id: 'half-bar', label: '1/2 Bar', amount: '0.5 bar', calories: 105, protein: 4, carbs: 16, fats: 4, fiber: 2, iron: 1, sodium: 75 },
+      { id: 'one-bar', label: '1 Bar', amount: '1 bar', calories: 210, protein: 8, carbs: 32, fats: 8, fiber: 4, iron: 2, sodium: 150 },
+      { id: 'hundred-grams', label: '100g', amount: '100g', calories: 412, protein: 15, carbs: 58, fats: 16, fiber: 7, iron: 3, sodium: 290 },
+      { id: 'two-bars', label: '2 Bars', amount: '2 bars', calories: 420, protein: 16, carbs: 64, fats: 16, fiber: 8, iron: 4, sodium: 300 },
+    ],
+  },
+}
+
+const recognitionItemsSeed = [
+  { id: 'recognition-chicken', name: 'Chicken Breast', amount: '150g est.', calories: 247, protein: 46, carbs: 0, fats: 5, ringX: 104, ringY: 200 },
+  { id: 'recognition-rice', name: 'White Rice', amount: '100g est.', calories: 130, protein: 3, carbs: 28, fats: 0, ringX: 220, ringY: 356 },
+  { id: 'recognition-broccoli', name: 'Steamed Broccoli', amount: '80g est.', calories: 28, protein: 2, carbs: 6, fats: 0, ringX: 284, ringY: 118 },
 ]
 
 const dashboardTabs = [
@@ -210,6 +283,254 @@ function ActivityArt({ type }) {
       <span />
       <span />
     </span>
+  )
+}
+
+function FoodHeroArt({ variant = 'toast' }) {
+  if (variant === 'bar') {
+    return (
+      <svg className="food-hero-art" viewBox="0 0 320 232" role="img" aria-label="Packaged oat bar">
+        <defs>
+          <linearGradient id="barHeroBg" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#1f242c" />
+            <stop offset="45%" stopColor="#121922" />
+            <stop offset="100%" stopColor="#070a11" />
+          </linearGradient>
+          <linearGradient id="barBoxGreen" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#8edb55" />
+            <stop offset="100%" stopColor="#4e8d34" />
+          </linearGradient>
+          <linearGradient id="barWrap" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#ce8248" />
+            <stop offset="100%" stopColor="#7f4122" />
+          </linearGradient>
+          <filter id="barHeroBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="16" />
+          </filter>
+        </defs>
+        <rect width="320" height="232" fill="url(#barHeroBg)" />
+        <circle cx="70" cy="188" r="54" fill="rgba(255,255,255,0.1)" filter="url(#barHeroBlur)" />
+        <circle cx="254" cy="36" r="44" fill="rgba(142,255,79,0.18)" filter="url(#barHeroBlur)" />
+        <g opacity="0.84">
+          <rect x="78" y="34" width="102" height="138" rx="18" fill="#4d3826" opacity="0.3" />
+          <rect x="72" y="28" width="102" height="138" rx="18" fill="url(#barBoxGreen)" />
+          <rect x="84" y="56" width="76" height="28" rx="10" fill="rgba(255,255,255,0.2)" />
+          <rect x="84" y="96" width="64" height="7" rx="3.5" fill="rgba(255,255,255,0.28)" />
+          <rect x="84" y="110" width="58" height="7" rx="3.5" fill="rgba(255,255,255,0.2)" />
+          <rect x="84" y="124" width="52" height="7" rx="3.5" fill="rgba(255,255,255,0.16)" />
+        </g>
+        <g transform="translate(184 66) rotate(28 44 68)">
+          <rect x="8" y="8" width="88" height="132" rx="22" fill="#533017" opacity="0.38" />
+          <rect x="0" y="0" width="88" height="132" rx="22" fill="url(#barWrap)" />
+          <rect x="14" y="20" width="60" height="34" rx="10" fill="rgba(255,255,255,0.18)" />
+          <rect x="56" y="20" width="12" height="86" fill="#fffdf6" opacity="0.92" />
+          <g stroke="#0d1117" strokeWidth="1.8">
+            {[0, 6, 12, 18, 24, 30].map((offset) => (
+              <line key={offset} x1={60 + offset * 0.55} y1="28" x2={60 + offset * 0.55} y2="96" />
+            ))}
+          </g>
+          <g transform="translate(14 70)">
+            {[0, 12, 24, 34, 46].map((x, index) => (
+              <ellipse key={x} cx={x + 8} cy={index % 2 ? 18 : 10} rx="9" ry="5" fill={index % 2 ? '#e7bf71' : '#d8ad5d'} />
+            ))}
+          </g>
+        </g>
+        <rect width="320" height="232" fill="url(#barHeroBg)" opacity="0.12" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg className="food-hero-art" viewBox="0 0 320 232" role="img" aria-label="Avocado toast with egg">
+      <defs>
+        <linearGradient id="foodHeroBg" x1="0%" x2="100%" y1="0%" y2="100%">
+          <stop offset="0%" stopColor="#202733" />
+          <stop offset="55%" stopColor="#101720" />
+          <stop offset="100%" stopColor="#070a11" />
+        </linearGradient>
+        <radialGradient id="foodHeroPlate" cx="50%" cy="45%" r="55%">
+          <stop offset="0%" stopColor="#1f2937" />
+          <stop offset="100%" stopColor="#0a0f16" />
+        </radialGradient>
+        <linearGradient id="foodHeroToast" x1="0%" x2="100%" y1="0%" y2="100%">
+          <stop offset="0%" stopColor="#9f6437" />
+          <stop offset="100%" stopColor="#6a3f1d" />
+        </linearGradient>
+        <linearGradient id="foodHeroAvocado" x1="0%" x2="100%" y1="0%" y2="100%">
+          <stop offset="0%" stopColor="#8be46f" />
+          <stop offset="100%" stopColor="#54b852" />
+        </linearGradient>
+        <filter id="foodGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="8" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="320" height="232" fill="url(#foodHeroBg)" />
+      <ellipse cx="156" cy="103" rx="128" ry="92" fill="url(#foodHeroPlate)" />
+      <ellipse cx="156" cy="103" rx="118" ry="84" fill="none" stroke="rgba(255,255,255,0.05)" />
+      <g transform="translate(92 48) rotate(-18 68 56)">
+        <rect x="18" y="12" width="112" height="88" rx="24" fill="#4d2e15" opacity="0.38" />
+        <rect x="14" y="8" width="112" height="88" rx="24" fill="url(#foodHeroToast)" />
+        <path d="M31 28c12-10 31-12 43-8 17-6 36 0 49 14-8 9-8 22 0 35-10 12-29 18-45 14-14 8-31 3-45-11-9-14-10-29-2-44Z" fill="url(#foodHeroAvocado)" filter="url(#foodGlow)" opacity="0.95" />
+        <path d="M50 32c10-8 26-9 37-6 15-4 29 0 40 12-6 8-6 19 0 30-8 9-22 14-35 11-12 6-25 2-36-8-7-11-8-24-1-39Z" fill="#74d766" opacity="0.82" />
+        <ellipse cx="82" cy="52" rx="26" ry="20" fill="#fff8ef" filter="url(#foodGlow)" />
+        <circle cx="82" cy="52" r="10.5" fill="#ffbf28" />
+        <circle cx="82" cy="52" r="6.5" fill="#ff9f11" opacity="0.72" />
+        <circle cx="108" cy="33" r="5.6" fill="#ef6c4c" />
+        <circle cx="115" cy="44" r="4.3" fill="#f58c5d" />
+        <circle cx="101" cy="39" r="2.1" fill="#f6cf80" />
+      </g>
+      <ellipse cx="282" cy="41" rx="34" ry="44" fill="rgba(171,255,70,0.18)" transform="rotate(18 282 41)" />
+      <rect width="320" height="232" fill="url(#foodHeroBg)" opacity="0.12" />
+    </svg>
+  )
+}
+
+function ScannerSceneArt() {
+  return (
+    <svg className="scanner-scene-art" viewBox="0 0 430 932" role="img" aria-label="Camera preview of packaged food">
+      <defs>
+        <linearGradient id="scannerBg" x1="0%" x2="100%" y1="0%" y2="100%">
+          <stop offset="0%" stopColor="#2a3138" />
+          <stop offset="60%" stopColor="#151a20" />
+          <stop offset="100%" stopColor="#0a0d12" />
+        </linearGradient>
+        <filter id="scannerBlur" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="18" />
+        </filter>
+      </defs>
+      <rect width="430" height="932" fill="url(#scannerBg)" />
+      <rect x="24" y="200" width="72" height="160" rx="10" fill="#656c73" opacity="0.65" filter="url(#scannerBlur)" />
+      <rect x="110" y="140" width="70" height="190" rx="14" fill="#86684b" opacity="0.78" filter="url(#scannerBlur)" />
+      <rect x="148" y="178" width="112" height="206" rx="18" fill="#5e8d35" opacity="0.92" filter="url(#scannerBlur)" />
+      <rect x="286" y="154" width="48" height="164" rx="12" fill="#7a674b" opacity="0.72" filter="url(#scannerBlur)" />
+      <rect x="344" y="166" width="44" height="150" rx="10" fill="#405b34" opacity="0.68" filter="url(#scannerBlur)" />
+      <ellipse cx="138" cy="824" rx="154" ry="88" fill="#4d3a2c" opacity="0.46" filter="url(#scannerBlur)" />
+      <ellipse cx="332" cy="704" rx="182" ry="96" fill="#6a4832" opacity="0.34" filter="url(#scannerBlur)" />
+      <g transform="translate(198 326)">
+        <rect x="0" y="0" width="108" height="252" rx="26" fill="#c57f47" opacity="0.34" />
+        <rect x="8" y="12" width="96" height="228" rx="24" fill="#b87138" />
+        <rect x="26" y="36" width="42" height="146" rx="10" fill="#fffdf3" />
+        <g stroke="#0b1117" strokeWidth="2">
+          {[0, 8, 16, 24, 32, 40].map((offset) => (
+            <line key={offset} x1={32 + offset} y1="44" x2={32 + offset} y2="174" />
+          ))}
+        </g>
+        <g transform="translate(18 148)">
+          {[0, 18, 34, 50].map((x, index) => (
+            <ellipse key={x} cx={x + 10} cy={index % 2 ? 30 : 14} rx="11" ry="7" fill={index % 2 ? '#dfb86e' : '#c9924a'} />
+          ))}
+        </g>
+      </g>
+      <rect width="430" height="932" fill="#0d1218" opacity="0.34" />
+    </svg>
+  )
+}
+
+function RecognitionPlateArt({ activeItemId }) {
+  const isActive = (id) => activeItemId === id
+
+  return (
+    <svg className="recognition-plate-art" viewBox="0 0 430 520" role="img" aria-label="Plate with detected foods">
+      <defs>
+        <radialGradient id="plateBg" cx="50%" cy="36%" r="70%">
+          <stop offset="0%" stopColor="#1b2029" />
+          <stop offset="100%" stopColor="#0c1016" />
+        </radialGradient>
+        <filter id="ringGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="10" />
+        </filter>
+      </defs>
+      <rect width="430" height="520" fill="url(#plateBg)" />
+      <circle cx="214" cy="238" r="176" fill="#e9ecef" />
+      <circle cx="214" cy="238" r="171" fill="none" stroke="#2d323b" strokeWidth="4" />
+      <ellipse cx="126" cy="264" rx="80" ry="120" fill="#f3c38f" />
+      <path d="M77 204c22-38 80-34 99 7 16 33 15 100-1 146-14 40-58 74-100 34-25-25-34-88-16-142 3-9 9-28 18-45Z" fill="#e3ad73" />
+      <g stroke="#8d421a" strokeWidth="7" strokeLinecap="round" opacity="0.72">
+        <path d="M88 228c28 8 70 12 92 8" />
+        <path d="M84 258c26 11 77 14 101 10" />
+        <path d="M94 294c34 12 70 16 87 14" />
+      </g>
+      <g fill="#f8f8f1">
+        {[
+          [170, 346], [188, 336], [206, 350], [220, 336], [238, 348], [254, 336],
+          [154, 376], [172, 368], [190, 382], [208, 370], [226, 382], [244, 370], [262, 382],
+          [164, 408], [182, 398], [200, 412], [218, 400], [236, 414], [254, 402],
+        ].map(([x, y]) => <ellipse key={`${x}-${y}`} cx={x} cy={y} rx="14" ry="8" />)}
+      </g>
+      {[
+        [248, 130], [304, 140], [332, 194], [308, 250], [262, 212], [340, 256], [284, 290],
+      ].map(([x, y], index) => (
+        <g key={`${x}-${y}`}>
+          <circle cx={x} cy={y} r="28" fill={index % 2 ? '#3d8f2d' : '#4caf3f'} />
+          <circle cx={x - 12} cy={y - 8} r="18" fill="#63bd4a" />
+          <circle cx={x + 10} cy={y - 6} r="18" fill="#2f7e28" />
+          <rect x={x - 5} y={y + 16} width="10" height="28" rx="5" fill="#86c45d" />
+        </g>
+      ))}
+      <g fill="none" stroke="#18ccef" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.86">
+        <path d="M104 200C172 164 252 154 284 118" />
+        <path d="M104 200C164 214 212 256 220 356" />
+        <path d="M220 356C312 336 338 212 284 118" />
+      </g>
+      {recognitionItemsSeed.map((item) => (
+        <g key={item.id}>
+          <circle cx={item.ringX} cy={item.ringY} r={isActive(item.id) ? 34 : 24} fill="#08c5eb" opacity={isActive(item.id) ? 0.22 : 0.14} filter="url(#ringGlow)" />
+          <circle cx={item.ringX} cy={item.ringY} r={isActive(item.id) ? 22 : 18} fill="none" stroke="#22d3ee" strokeWidth={isActive(item.id) ? 7 : 5} />
+          <circle cx={item.ringX} cy={item.ringY} r="10" fill="#1fcbe8" />
+        </g>
+      ))}
+      <rect width="430" height="520" fill="#0d1218" opacity="0.08" />
+    </svg>
+  )
+}
+
+function RadialMacroChart({ calories, protein, carbs, fats }) {
+  const segments = [
+    { id: 'protein', value: protein, color: '#06B6D4', glow: 'rgba(6, 182, 212, 0.54)' },
+    { id: 'carbs', value: carbs, color: '#8EFF4F', glow: 'rgba(142, 255, 79, 0.52)' },
+    { id: 'fats', value: fats, color: '#FF6B6B', glow: 'rgba(255, 107, 107, 0.48)' },
+  ]
+  const radius = 82
+  const circumference = 2 * Math.PI * radius
+  const gap = 12
+  const total = segments.reduce((sum, segment) => sum + segment.value, 0)
+  let progress = 0
+
+  return (
+    <div className="macro-ring-card">
+      <svg className="macro-ring-chart" viewBox="0 0 240 240" aria-hidden="true">
+        <circle className="macro-ring-chart__track" cx="120" cy="120" r={radius} />
+        {segments.map((segment) => {
+          const ratio = segment.value / total
+          const length = Math.max(circumference * ratio - gap, 18)
+          const offset = -(circumference * progress)
+          progress += ratio
+
+          return (
+            <circle
+              key={segment.id}
+              className="macro-ring-chart__segment"
+              cx="120"
+              cy="120"
+              r={radius}
+              stroke={segment.color}
+              strokeDasharray={`${length} ${circumference}`}
+              strokeDashoffset={offset}
+              style={{ filter: `drop-shadow(0 0 14px ${segment.glow})` }}
+            />
+          )
+        })}
+      </svg>
+      <div className="macro-ring-card__center">
+        <strong>{calories}</strong>
+        <span>Calories</span>
+        <p>Per serving</p>
+      </div>
+    </div>
   )
 }
 
@@ -425,7 +746,7 @@ function ResultScreen({ profile, goal, activity, diet, onBack, onEnter }) {
   )
 }
 
-function DashboardHome({ profile, goal, activity }) {
+function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood }) {
   const targetCalories = calculateTargetCalories(profile, goal, activity)
   const consumedCalories = Math.round(targetCalories * 0.84)
   const macros = calculateMacros(targetCalories, goal)
@@ -468,12 +789,12 @@ function DashboardHome({ profile, goal, activity }) {
       </article>
       <section className="quick-actions">
         {[
-          ['Log Meal', 'nutrition'],
-          ['Scan Food', 'scan'],
-          ['Add Workout', 'fitness'],
-          ['Track Water', 'water'],
-        ].map(([label, icon]) => (
-          <button key={label} className="quick-action" type="button">
+          { label: 'Log Meal', icon: 'nutrition', action: onLogMeal },
+          { label: 'Scan Food', icon: 'scan', action: onScanFood },
+          { label: 'Add Workout', icon: 'fitness' },
+          { label: 'Track Water', icon: 'water' },
+        ].map(({ label, icon, action }) => (
+          <button key={label} className="quick-action" type="button" onClick={action}>
             <span className="quick-action__icon"><Icon name={icon} /></span>
             <span>{label}</span>
           </button>
@@ -483,7 +804,7 @@ function DashboardHome({ profile, goal, activity }) {
   )
 }
 
-function DashboardNutrition() {
+function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail, onDuplicateMealItem, onDeleteMealItem }) {
   return (
     <div className="dashboard-view dashboard-view--nutrition screen-fade">
       <header className="nutrition-header">
@@ -495,15 +816,20 @@ function DashboardNutrition() {
       </header>
       <div className="meal-sections">
         {mealSections.map((section) => (
-          <section key={section.title} className="meal-section">
+          <section key={section.id} className="meal-section">
             <div className="meal-section__header">
               <h3>{section.title}</h3>
-              <button type="button">+ Add</button>
+              <button type="button" onClick={() => onOpenAddFood(section.id)}>+ Add</button>
             </div>
             <div className="meal-section__list">
               {section.items.map((item) => (
-                <article key={`${section.title}-${item.name}`} className="meal-card">
-                  <div className="meal-card__main">
+                <article key={item.id} className="meal-card">
+                  <button
+                    className={`meal-card__main meal-card__main--interactive${item.detailFoodId ? '' : ' is-static'}`}
+                    type="button"
+                    onClick={() => item.detailFoodId && onOpenFoodDetail(item.detailFoodId, section.id, 'hub')}
+                    disabled={!item.detailFoodId}
+                  >
                     <div>
                       <h4>{item.name}</h4>
                       <span>{item.amount}</span>
@@ -512,16 +838,287 @@ function DashboardNutrition() {
                       <strong>{item.calories} kcal</strong>
                       <span><b>{item.protein}g P</b> / {item.carbs}g C / {item.fats}g F</span>
                     </div>
-                  </div>
+                  </button>
                   <div className="meal-card__actions">
-                    <button type="button"><Icon name="copy" /></button>
-                    <button type="button" className="is-danger"><Icon name="trash" /></button>
+                    <button type="button" onClick={() => onDuplicateMealItem(section.id, item.id)} aria-label={`Duplicate ${item.name}`}>
+                      <Icon name="copy" />
+                    </button>
+                    <button type="button" className="is-danger" onClick={() => onDeleteMealItem(section.id, item.id)} aria-label={`Delete ${item.name}`}>
+                      <Icon name="trash" />
+                    </button>
                   </div>
                 </article>
               ))}
             </div>
           </section>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function AddFoodScreen({ onBack, onQuickAdd, onOpenFoodDetail, onOpenScanner }) {
+  const [query, setQuery] = useState('')
+  const [activeTab, setActiveTab] = useState('recent')
+  const [successItemId, setSuccessItemId] = useState(null)
+  const inputRef = useRef(null)
+  const successTimeoutRef = useRef(null)
+  const visibleFoods = addFoodLibrary[activeTab].filter((food) => food.name.toLowerCase().includes(query.trim().toLowerCase()))
+
+  useEffect(() => {
+    inputRef.current?.focus()
+
+    return () => window.clearTimeout(successTimeoutRef.current)
+  }, [])
+
+  function handleQuickAdd(food) {
+    onQuickAdd(food)
+    setSuccessItemId(food.id)
+    window.clearTimeout(successTimeoutRef.current)
+    successTimeoutRef.current = window.setTimeout(() => setSuccessItemId(null), 900)
+  }
+
+  return (
+    <div className="food-flow screen-fade">
+      <div className="food-flow__top">
+        <button className="back-button back-button--minimal" type="button" onClick={onBack} aria-label="Back to food diary">
+          <Icon name="arrow" />
+        </button>
+      </div>
+      <div className="food-search">
+        <span className="food-search__icon">
+          <Icon name="search" />
+        </span>
+        <input ref={inputRef} type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search" aria-label="Search foods" />
+        <button className="food-search__scan" type="button" onClick={onOpenScanner} aria-label="Open barcode scanner">
+          <Icon name="scan" />
+        </button>
+      </div>
+      <div className="food-tab-row" role="tablist" aria-label="Food filters">
+        {addFoodTabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={`food-tab-pill${activeTab === tab.id ? ' is-active' : ''}`}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="food-list" role="list" aria-label={`${addFoodTabs.find((tab) => tab.id === activeTab)?.label} foods`}>
+        {visibleFoods.length ? (
+          visibleFoods.map((food) => {
+            const canOpenDetail = Boolean(food.detailFoodId)
+
+            return (
+              <div key={food.id} className="food-row" role="listitem">
+                {canOpenDetail ? (
+                  <button className="food-row__detail food-row__detail--interactive" type="button" onClick={() => onOpenFoodDetail(food.detailFoodId, undefined, 'addFood')}>
+                    <span>{food.name}</span>
+                  </button>
+                ) : (
+                  <div className="food-row__detail">
+                    <span>{food.name}</span>
+                  </div>
+                )}
+                <button
+                  className={`food-row__action${successItemId === food.id ? ' is-success' : ''}`}
+                  type="button"
+                  onClick={() => handleQuickAdd(food)}
+                  aria-label={`Quick add ${food.name}`}
+                >
+                  <Icon name={successItemId === food.id ? 'check' : 'plus'} />
+                </button>
+              </div>
+            )
+          })
+        ) : (
+          <div className="food-list__empty">
+            <strong>No matches yet</strong>
+            <span>Try a broader search or switch tabs.</span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function BarcodeScannerScreen({ onBack, onDetected, onManualEntry }) {
+  const [flashOn, setFlashOn] = useState(false)
+  const [isDetected, setIsDetected] = useState(false)
+  const detectionTimeoutRef = useRef(null)
+  const transitionTimeoutRef = useRef(null)
+
+  useEffect(() => {
+    detectionTimeoutRef.current = window.setTimeout(() => {
+      setIsDetected(true)
+      window.navigator.vibrate?.(22)
+      transitionTimeoutRef.current = window.setTimeout(onDetected, 260)
+    }, 1650)
+
+    return () => {
+      window.clearTimeout(detectionTimeoutRef.current)
+      window.clearTimeout(transitionTimeoutRef.current)
+    }
+  }, [onDetected])
+
+  return (
+    <div className="scanner-screen screen-fade">
+      <ScannerSceneArt />
+      <div className="scanner-screen__veil" />
+      <div className="scanner-screen__topbar">
+        <button className="scanner-glass-button" type="button" onClick={onBack} aria-label="Back to add food">
+          <Icon name="arrow" />
+        </button>
+        <button className={`scanner-glass-button${flashOn ? ' is-active' : ''}`} type="button" onClick={() => setFlashOn((current) => !current)} aria-label="Toggle flashlight">
+          <Icon name="flash" />
+        </button>
+      </div>
+      <div className={`scanner-reticle${isDetected ? ' is-detected' : ''}`}>
+        <span className="scanner-reticle__corner scanner-reticle__corner--tl" />
+        <span className="scanner-reticle__corner scanner-reticle__corner--tr" />
+        <span className="scanner-reticle__corner scanner-reticle__corner--bl" />
+        <span className="scanner-reticle__corner scanner-reticle__corner--br" />
+        <span className="scanner-reticle__scanline" />
+      </div>
+      <div className="scanner-screen__copy">
+        <p>Scanning food...</p>
+      </div>
+      <button className="scanner-screen__manual" type="button" onClick={onManualEntry}>
+        Enter Manually
+      </button>
+    </div>
+  )
+}
+
+function RecognitionScreen({ onBack, onConfirm }) {
+  const [items, setItems] = useState(() => recognitionItemsSeed.map((item) => ({ ...item, enabled: true })))
+  const [activeItemId, setActiveItemId] = useState(recognitionItemsSeed[0]?.id ?? null)
+  const flashTimeoutRef = useRef(null)
+  const enabledItems = items.filter((item) => item.enabled)
+
+  useEffect(() => () => window.clearTimeout(flashTimeoutRef.current), [])
+
+  function handleHighlight(itemId) {
+    setActiveItemId(itemId)
+    window.clearTimeout(flashTimeoutRef.current)
+    flashTimeoutRef.current = window.setTimeout(() => setActiveItemId(null), 850)
+  }
+
+  function handleToggle(itemId) {
+    setItems((current) => current.map((item) => (
+      item.id === itemId ? { ...item, enabled: !item.enabled } : item
+    )))
+    handleHighlight(itemId)
+  }
+
+  return (
+    <div className="recognition-screen screen-fade">
+      <div className="recognition-screen__photo">
+        <button className="recognition-screen__back scanner-glass-button" type="button" onClick={onBack} aria-label="Back">
+          <Icon name="arrow" />
+        </button>
+        <RecognitionPlateArt activeItemId={activeItemId} />
+      </div>
+      <div className="recognition-sheet">
+        <div className="recognition-sheet__handle" aria-hidden="true" />
+        <h2>Detected on plate</h2>
+        <div className="recognition-list">
+          {items.map((item) => (
+            <article key={item.id} className={`recognition-row${activeItemId === item.id ? ' is-active' : ''}`}>
+              <button className="recognition-row__focus" type="button" onClick={() => handleHighlight(item.id)}>
+                <strong>{item.name}</strong>
+                <span>{item.amount}</span>
+              </button>
+              <button
+                className={`recognition-toggle${item.enabled ? ' is-on' : ''}`}
+                type="button"
+                role="switch"
+                aria-checked={item.enabled}
+                aria-label={`Toggle ${item.name}`}
+                onClick={() => handleToggle(item.id)}
+              >
+                <span />
+              </button>
+            </article>
+          ))}
+        </div>
+        <button className="primary-button recognition-sheet__cta" type="button" onClick={() => onConfirm(enabledItems)} disabled={!enabledItems.length}>
+          {`Confirm & Log (${enabledItems.length} ${enabledItems.length === 1 ? 'Item' : 'Items'})`}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function FoodDetailScreen({ food, selectedPortionId, onSelectPortion, onBack, onLogFood }) {
+  const activePortion = food?.portions.find((portion) => portion.id === selectedPortionId) ?? food?.portions[0]
+
+  if (!food || !activePortion) return null
+
+  const nutritionCards = [
+    { id: 'protein', label: 'Protein', value: `${activePortion.protein}g`, tone: 'protein' },
+    { id: 'carbs', label: 'Carbs', value: `${activePortion.carbs}g`, tone: 'carbs' },
+    { id: 'fats', label: 'Fat', value: `${activePortion.fats}g`, tone: 'fats' },
+    { id: 'fiber', label: 'Fiber', value: `${activePortion.fiber}g`, tone: 'neutral' },
+    { id: 'iron', label: 'Iron', value: `${activePortion.iron}mg`, tone: 'neutral' },
+    { id: 'sodium', label: 'Sodium', value: `${activePortion.sodium}mg`, tone: 'neutral', wide: true },
+  ]
+
+  const insight = activePortion.fiber >= 8
+    ? food.insight
+    : activePortion.protein >= 24
+      ? 'This lands nearly halfway to your protein target.'
+      : food.insight ?? 'Balanced macros with enough fat to stay satisfying.'
+
+  return (
+    <div className="food-detail screen-fade">
+      <section className="food-detail__hero">
+        <div className="food-detail__media">
+          <button className="back-button food-detail__back" type="button" onClick={onBack} aria-label="Back">
+            <Icon name="arrow" />
+          </button>
+          <FoodHeroArt variant={food.art} />
+          <div className="food-detail__media-copy">
+            <h2>{food.name}</h2>
+          </div>
+        </div>
+        <div className="portion-strip" role="tablist" aria-label="Portion selector">
+          {food.portions.map((portion) => (
+            <button
+              key={portion.id}
+              className={`portion-strip__pill${portion.id === activePortion.id ? ' is-active' : ''}`}
+              type="button"
+              role="tab"
+              aria-selected={portion.id === activePortion.id}
+              onClick={() => onSelectPortion(portion.id)}
+            >
+              {portion.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="food-detail__stats">
+        <RadialMacroChart calories={activePortion.calories} protein={activePortion.protein} carbs={activePortion.carbs} fats={activePortion.fats} />
+        <div className="nutrition-grid">
+          {nutritionCards.map((card) => (
+            <article key={card.id} className={`nutrition-card nutrition-card--${card.tone}${card.wide ? ' nutrition-card--wide' : ''}`}>
+              <strong>{card.value}</strong>
+              <span>{card.label}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <div className="food-detail__footer">
+        <p>{insight}</p>
+        <button className="primary-button food-detail__cta" type="button" onClick={onLogFood}>
+          Log Food
+        </button>
       </div>
     </div>
   )
@@ -603,26 +1200,82 @@ function DashboardProfile({ profile, goal, activity, diet }) {
   )
 }
 
-function DashboardScreen({ activeTab, onTabChange, profile, goal, activity, diet }) {
+function DashboardScreen({
+  activeTab,
+  onTabChange,
+  profile,
+  goal,
+  activity,
+  diet,
+  mealSections,
+  nutritionView,
+  selectedFood,
+  selectedPortionId,
+  onSelectPortion,
+  onOpenAddFood,
+  onOpenScanner,
+  onOpenRecognition,
+  onOpenFoodDetail,
+  onQuickAddFood,
+  onConfirmRecognition,
+  onLogFood,
+  onDuplicateMealItem,
+  onDeleteMealItem,
+  onCloseNutritionFlow,
+  onCloseScannerFlow,
+  onCloseRecognitionFlow,
+}) {
   let content = null
+  const isImmersiveNutrition = activeTab === 'nutrition' && nutritionView !== 'hub'
+  const isFullBleedNutrition = activeTab === 'nutrition' && ['scanner', 'recognition'].includes(nutritionView)
 
-  if (activeTab === 'home') content = <DashboardHome profile={profile} goal={goal} activity={activity} />
-  else if (activeTab === 'nutrition') content = <DashboardNutrition />
+  if (activeTab === 'home') content = <DashboardHome profile={profile} goal={goal} activity={activity} onLogMeal={() => onOpenAddFood('breakfast')} onScanFood={() => onOpenRecognition('lunch')} />
+  else if (activeTab === 'nutrition') {
+    if (nutritionView === 'addFood') {
+      content = <AddFoodScreen onBack={onCloseNutritionFlow} onQuickAdd={onQuickAddFood} onOpenFoodDetail={onOpenFoodDetail} onOpenScanner={onOpenScanner} />
+    } else if (nutritionView === 'scanner') {
+      content = <BarcodeScannerScreen onBack={onCloseScannerFlow} onDetected={() => onOpenFoodDetail('cinnamon-oat-bar', undefined, 'scanner')} onManualEntry={onCloseScannerFlow} />
+    } else if (nutritionView === 'recognition') {
+      content = <RecognitionScreen onBack={onCloseRecognitionFlow} onConfirm={onConfirmRecognition} />
+    } else if (nutritionView === 'food-detail') {
+      content = (
+        <FoodDetailScreen
+          food={selectedFood}
+          selectedPortionId={selectedPortionId}
+          onSelectPortion={onSelectPortion}
+          onBack={onCloseNutritionFlow}
+          onLogFood={onLogFood}
+        />
+      )
+    } else {
+      content = (
+        <DashboardNutrition
+          mealSections={mealSections}
+          onOpenAddFood={onOpenAddFood}
+          onOpenFoodDetail={onOpenFoodDetail}
+          onDuplicateMealItem={onDuplicateMealItem}
+          onDeleteMealItem={onDeleteMealItem}
+        />
+      )
+    }
+  }
   else if (activeTab === 'fitness') content = <DashboardFitness />
   else if (activeTab === 'insights') content = <DashboardInsights />
   else content = <DashboardProfile profile={profile} goal={goal} activity={activity} diet={diet} />
 
   return (
-    <div className="dashboard-shell">
-      <div className="dashboard-scroll">{content}</div>
-      <nav className="tab-bar" aria-label="Main app navigation">
-        {dashboardTabs.map((tab) => (
-          <button key={tab.id} className={`tab-bar__item${activeTab === tab.id ? ' is-active' : ''}`} type="button" onClick={() => onTabChange(tab.id)}>
-            <Icon name={tab.icon} />
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </nav>
+    <div className={`dashboard-shell${isImmersiveNutrition ? ' dashboard-shell--immersive' : ''}${isFullBleedNutrition ? ' dashboard-shell--full-bleed' : ''}`}>
+      <div className={`dashboard-scroll${isImmersiveNutrition ? ' dashboard-scroll--immersive' : ''}${isFullBleedNutrition ? ' dashboard-scroll--full-bleed' : ''}`}>{content}</div>
+      {!isImmersiveNutrition ? (
+        <nav className="tab-bar" aria-label="Main app navigation">
+          {dashboardTabs.map((tab) => (
+            <button key={tab.id} className={`tab-bar__item${activeTab === tab.id ? ' is-active' : ''}`} type="button" onClick={() => onTabChange(tab.id)}>
+              <Icon name={tab.icon} />
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+      ) : null}
     </div>
   )
 }
@@ -634,7 +1287,14 @@ function App() {
   const [activity, setActivity] = useState('lightly')
   const [diet, setDiet] = useState('paleo')
   const [activeTab, setActiveTab] = useState('home')
+  const [mealSections, setMealSections] = useState(mealSectionsSeed)
+  const [nutritionView, setNutritionView] = useState('hub')
+  const [nutritionTargetSectionId, setNutritionTargetSectionId] = useState('breakfast')
+  const [nutritionReturnView, setNutritionReturnView] = useState('hub')
+  const [selectedFoodId, setSelectedFoodId] = useState('avocado-toast-egg')
+  const [selectedPortionId, setSelectedPortionId] = useState('one-slice')
   const timeoutRef = useRef(null)
+  const mealEntryRef = useRef(0)
 
   useEffect(() => () => window.clearTimeout(timeoutRef.current), [])
 
@@ -667,9 +1327,148 @@ function App() {
     queueNext('result')
   }
 
-  const screenClass = `phone-screen ${
-    screen === 'welcome' ? 'phone-screen--welcome' : screen === 'dashboard' ? 'phone-screen--dashboard' : 'phone-screen--flow'
-  }`
+  function createMealEntry(food, detailFoodId = null) {
+    mealEntryRef.current += 1
+
+    return {
+      id: `meal-${mealEntryRef.current}`,
+      name: food.name,
+      amount: food.amount,
+      calories: food.calories,
+      protein: food.protein,
+      carbs: food.carbs,
+      fats: food.fats,
+      fiber: food.fiber,
+      sodium: food.sodium,
+      detailFoodId,
+    }
+  }
+
+  function insertMealEntry(sectionId, entry) {
+    setMealSections((current) => current.map((section) => (
+      section.id === sectionId
+        ? { ...section, items: [entry, ...section.items] }
+        : section
+    )))
+  }
+
+  function insertMealEntries(sectionId, entries) {
+    setMealSections((current) => current.map((section) => (
+      section.id === sectionId
+        ? { ...section, items: [...entries, ...section.items] }
+        : section
+    )))
+  }
+
+  function openAddFood(sectionId = 'breakfast') {
+    setActiveTab('nutrition')
+    setNutritionTargetSectionId(sectionId)
+    setNutritionView('addFood')
+  }
+
+  function openScanner() {
+    setActiveTab('nutrition')
+    setNutritionView('scanner')
+  }
+
+  function closeScannerFlow() {
+    setNutritionView('addFood')
+  }
+
+  function openRecognition(sectionId = 'lunch') {
+    setActiveTab('nutrition')
+    setNutritionTargetSectionId(sectionId)
+    setNutritionView('recognition')
+  }
+
+  function closeRecognitionFlow() {
+    setNutritionView('hub')
+    setActiveTab('home')
+  }
+
+  function openFoodDetail(foodId, sectionId = nutritionTargetSectionId, returnView = 'hub') {
+    const detail = foodDetails[foodId] ?? foodDetails['avocado-toast-egg']
+    const defaultPortion = detail.portions.find((portion) => portion.id === 'one-slice')?.id ?? detail.portions.find((portion) => portion.id === 'one-bar')?.id ?? detail.portions[0]?.id
+
+    setActiveTab('nutrition')
+    setNutritionTargetSectionId(sectionId ?? 'breakfast')
+    setNutritionReturnView(returnView)
+    setSelectedFoodId(detail.id)
+    setSelectedPortionId(defaultPortion)
+    setNutritionView('food-detail')
+  }
+
+  function closeNutritionFlow() {
+    if (nutritionView === 'food-detail' && nutritionReturnView === 'addFood') {
+      setNutritionView('addFood')
+      return
+    }
+
+    if (nutritionView === 'food-detail' && nutritionReturnView === 'scanner') {
+      setNutritionView('scanner')
+      return
+    }
+
+    setNutritionView('hub')
+  }
+
+  function handleQuickAddFood(food) {
+    insertMealEntry(nutritionTargetSectionId, createMealEntry(food, food.detailFoodId))
+  }
+
+  function handleLogFood() {
+    const food = foodDetails[selectedFoodId] ?? foodDetails['avocado-toast-egg']
+    const portion = food.portions.find((item) => item.id === selectedPortionId) ?? food.portions[0]
+
+    insertMealEntry(nutritionTargetSectionId, createMealEntry({ ...portion, name: food.name }, food.id))
+    setNutritionView('hub')
+  }
+
+  function handleConfirmRecognition(items) {
+    const entries = items.map((item) => createMealEntry({
+      name: item.name,
+      amount: item.amount.replace(' est.', ''),
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fats: item.fats,
+    }))
+
+    insertMealEntries(nutritionTargetSectionId, entries)
+    setNutritionView('hub')
+    setActiveTab('nutrition')
+  }
+
+  function handleDuplicateMealItem(sectionId, itemId) {
+    setMealSections((current) => current.map((section) => {
+      if (section.id !== sectionId) return section
+
+      const nextItems = []
+
+      section.items.forEach((item) => {
+        nextItems.push(item)
+
+        if (item.id === itemId) {
+          mealEntryRef.current += 1
+          nextItems.push({ ...item, id: `meal-${mealEntryRef.current}` })
+        }
+      })
+
+      return { ...section, items: nextItems }
+    }))
+  }
+
+  function handleDeleteMealItem(sectionId, itemId) {
+    setMealSections((current) => current.map((section) => (
+      section.id === sectionId
+        ? { ...section, items: section.items.filter((item) => item.id !== itemId) }
+        : section
+    )))
+  }
+
+  const screenClass = `phone-screen ${screen === 'welcome' ? 'phone-screen--welcome' : screen === 'dashboard' ? 'phone-screen--dashboard' : 'phone-screen--flow'
+    }`
+  const selectedFood = foodDetails[selectedFoodId] ?? foodDetails['avocado-toast-egg']
 
   return (
     <main className="app-shell">
@@ -684,7 +1483,33 @@ function App() {
         {screen === 'activity' ? <ActivityScreen selected={activity} onBack={() => goTo('profile')} onSelect={handleActivitySelect} /> : null}
         {screen === 'diet' ? <DietScreen selected={diet} onBack={() => goTo('activity')} onSelect={handleDietSelect} /> : null}
         {screen === 'result' ? <ResultScreen profile={profile} goal={activeGoal ?? 'energy'} activity={activity} diet={diet} onBack={() => goTo('diet')} onEnter={() => goTo('dashboard')} /> : null}
-        {screen === 'dashboard' ? <DashboardScreen activeTab={activeTab} onTabChange={setActiveTab} profile={profile} goal={activeGoal ?? 'energy'} activity={activity} diet={diet} /> : null}
+        {screen === 'dashboard' ? (
+          <DashboardScreen
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            profile={profile}
+            goal={activeGoal ?? 'energy'}
+            activity={activity}
+            diet={diet}
+            mealSections={mealSections}
+            nutritionView={nutritionView}
+            selectedFood={selectedFood}
+            selectedPortionId={selectedPortionId}
+            onSelectPortion={setSelectedPortionId}
+            onOpenAddFood={openAddFood}
+            onOpenScanner={openScanner}
+            onOpenRecognition={openRecognition}
+            onOpenFoodDetail={openFoodDetail}
+            onQuickAddFood={handleQuickAddFood}
+            onConfirmRecognition={handleConfirmRecognition}
+            onLogFood={handleLogFood}
+            onDuplicateMealItem={handleDuplicateMealItem}
+            onDeleteMealItem={handleDeleteMealItem}
+            onCloseNutritionFlow={closeNutritionFlow}
+            onCloseScannerFlow={closeScannerFlow}
+            onCloseRecognitionFlow={closeRecognitionFlow}
+          />
+        ) : null}
       </section>
     </main>
   )
