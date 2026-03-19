@@ -891,86 +891,260 @@ function ResultScreen({ profile, goal, activity, diet, onBack, onEnter }) {
   )
 }
 
-function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood }) {
+function HomeMacroBar({ label, current, goal, colorClass }) {
+  const pct = Math.min((current / goal) * 100, 100)
+
+  return (
+    <div className="macro-item" data-testid={`macro-${label.toLowerCase()}`}>
+      <div className="macro-header">
+        <span className="macro-label">{label}</span>
+        <span className="macro-values">
+          <span className={`macro-current ${colorClass}`}>{Math.round(current)}</span>
+          <span className="macro-goal">/{goal}g</span>
+        </span>
+      </div>
+      <div className="macro-bar-bg">
+        <div className={`macro-bar-fill ${colorClass}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  )
+}
+
+function HomeQuickAction({ icon, label, onClick, active = false, accentClass = '' }) {
+  return (
+    <button className={`quick-action-btn${active ? ' is-active' : ''}`} type="button" onClick={onClick} data-testid={`qa-${label.toLowerCase().replace(/\s/g, '-')}`}>
+      <div className={`quick-action-icon${accentClass ? ` ${accentClass}` : ''}`}>{icon}</div>
+      <span className="quick-action-label">{label}</span>
+    </button>
+  )
+}
+
+function HomeCalorieRing({ current, goal }) {
+  const radius = 58
+  const stroke = 10
+  const center = 70
+  const circumference = 2 * Math.PI * radius
+  const progress = Math.min(current / goal, 1)
+  const offset = circumference * (1 - progress)
+
+  return (
+    <div className="calorie-ring-wrapper" data-testid="calorie-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#00BCD4" />
+            <stop offset="50%" stopColor="#4AE87C" />
+            <stop offset="100%" stopColor="#8EFF4F" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="url(#ringGrad)"
+          strokeWidth={stroke}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${center} ${center})`}
+          filter="url(#glow)"
+          style={{ transition: 'stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1)' }}
+        />
+      </svg>
+      <div className="calorie-ring-text">
+        <span className="calorie-value">{Math.round(current)}</span>
+        <span className="calorie-goal">/ {goal} kcal</span>
+      </div>
+    </div>
+  )
+}
+
+function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood, onAddWorkout }) {
   const targetCalories = calculateTargetCalories(profile, goal, activity)
   const consumedCalories = Math.round(targetCalories * 0.84)
   const macros = calculateMacros(targetCalories, goal)
-  const calorieProgress = Math.min(consumedCalories / targetCalories, 1)
-  const calorieRingRadius = 54
-  const calorieRingCircumference = 2 * Math.PI * calorieRingRadius
-  const calorieRingOffset = calorieRingCircumference * (1 - calorieProgress)
+  const [showWater, setShowWater] = useState(false)
+  const [waterConsumed, setWaterConsumed] = useState(1250)
   const progressRows = [
-    ['Protein', Math.round(macros.protein * 0.82), macros.protein, 'protein'],
-    ['Carbs', Math.round(macros.carbs * 0.9), macros.carbs, 'carbs'],
-    ['Fat', Math.round(macros.fats * 0.75), macros.fats, 'fats'],
+    ['Protein', Math.round(macros.protein * 0.82), macros.protein, 'macro-cyan'],
+    ['Carbs', Math.round(macros.carbs * 0.9), macros.carbs, 'macro-lime'],
+    ['Fat', Math.round(macros.fats * 0.75), macros.fats, 'macro-coral'],
   ]
+
+  function handleLogWater(amount) {
+    setWaterConsumed((current) => current + amount)
+    setShowWater(false)
+  }
 
   return (
     <div className="dashboard-view dashboard-view--home screen-fade">
-      <header className="dashboard-header">
+      <header className="dashboard-header dashboard-header--home">
         <div>
-          <h2>Good Morning,<br />Alex</h2>
+          <h1 className="greeting">Good Morning,</h1>
+          <h1 className="greeting">Alex</h1>
         </div>
-        <button className="avatar-badge" type="button"><span>A</span></button>
+        <div className="avatar-ring avatar-ring--home" data-testid="avatar">
+          <div className="avatar-inner" />
+        </div>
       </header>
-      <article className="dashboard-card dashboard-card--summary">
-        <div className="summary-card__top">
-          <span>Calories</span>
-          <span>Macro Breakdown</span>
-        </div>
-        <div className="summary-card__content">
-          <div className="calorie-ring">
-            <svg className="calorie-ring__svg" viewBox="0 0 128 128" aria-hidden="true">
-              <defs>
-                <linearGradient id="homeCalorieRingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#22d3ee" />
-                  <stop offset="100%" stopColor="#8dff44" />
-                </linearGradient>
-              </defs>
-              <circle className="calorie-ring__track" cx="64" cy="64" r={calorieRingRadius} />
-              <circle
-                className="calorie-ring__progress"
-                cx="64"
-                cy="64"
-                r={calorieRingRadius}
-                style={{
-                  strokeDasharray: calorieRingCircumference,
-                  strokeDashoffset: calorieRingOffset,
-                }}
-              />
-            </svg>
-            <div className="calorie-ring__inner">
-              <strong>{consumedCalories}</strong>
-              <span>/ {targetCalories} kcal</span>
-            </div>
+
+      <article className="card scale-in home-card" data-testid="calorie-card">
+        <div className="calorie-card-content">
+          <div className="calorie-left">
+            <span className="card-label">Calories</span>
+            <HomeCalorieRing current={consumedCalories} goal={targetCalories} />
           </div>
-          <div className="macro-breakdown">
-            {progressRows.map(([label, value, total, tone]) => (
-              <div key={label} className="macro-breakdown__row">
-                <div className="macro-breakdown__labels"><span>{label}</span><span>{value}/{total}g</span></div>
-                <div className="macro-breakdown__track"><div className={`macro-breakdown__fill macro-breakdown__fill--${tone}`} style={{ width: `${(value / total) * 100}%` }} /></div>
-              </div>
+          <div className="macro-right">
+            <span className="card-label">Macro Breakdown</span>
+            {progressRows.map(([label, value, total, colorClass]) => (
+              <HomeMacroBar key={label} label={label} current={value} goal={total} colorClass={colorClass} />
             ))}
           </div>
         </div>
       </article>
-      <article className="dashboard-card">
-        <h3>Today&apos;s Plan</h3>
-        <div className="plan-item"><Icon name="spark" /><p>Nutrition: You&apos;re 30g short on protein. A Greek yogurt bowl closes the gap.</p></div>
-        <div className="plan-item"><Icon name="energy" /><p>Fitness: Recovery is at 90%. Perfect day for a focused lower body session.</p></div>
+
+      <article className="card scale-in stagger-1 home-card" data-testid="todays-plan">
+        <span className="card-label">Today&apos;s Plan</span>
+        <div className="coaching-tip">
+          <div className="coaching-icon coaching-icon--nutrition">
+            <Icon name="spark" />
+          </div>
+          <div>
+            <span className="tip-type">Nutrition:</span>{' '}
+            <span className="tip-message">You&apos;re 30g short on protein. A Greek yogurt would close the gap.</span>
+          </div>
+        </div>
+        <div className="coaching-tip">
+          <div className="coaching-icon coaching-icon--fitness">
+            <Icon name="energy" />
+          </div>
+          <div>
+            <span className="tip-type">Fitness:</span>{' '}
+            <span className="tip-message">Recovery is at 90%. Perfect day for the planned Heavy Legs session.</span>
+          </div>
+        </div>
       </article>
-      <section className="quick-actions">
-        {[
-          { label: 'Log Meal', icon: 'nutrition', action: onLogMeal },
-          { label: 'Scan Food', icon: 'scan', action: onScanFood },
-          { label: 'Add Workout', icon: 'fitness' },
-          { label: 'Track Water', icon: 'water' },
-        ].map(({ label, icon, action }) => (
-          <button key={label} className="quick-action" type="button" onClick={action}>
-            <span className="quick-action__icon"><Icon name={icon} /></span>
-            <span>{label}</span>
+
+      <div className="quick-actions scale-in stagger-2" data-testid="quick-actions">
+        <HomeQuickAction icon={<Icon name="nutrition" />} label="Log Meal" onClick={onLogMeal} />
+        <HomeQuickAction icon={<Icon name="scan" />} label="Scan Food" onClick={onScanFood} />
+        <HomeQuickAction icon={<Icon name="fitness" />} label="Add Workout" onClick={onAddWorkout} active />
+        <HomeQuickAction icon={<Icon name="water" />} label="Track Water" onClick={() => setShowWater(true)} />
+      </div>
+
+      {showWater ? (
+        <div className="water-modal-overlay" onClick={() => setShowWater(false)} data-testid="water-modal">
+          <div className="water-modal" onClick={(event) => event.stopPropagation()}>
+            <h3>Track Water</h3>
+            <p>
+              Current: {waterConsumed}ml / 3000ml
+            </p>
+            <div className="water-btns">
+              <button className="water-btn water-btn-add" type="button" onClick={() => handleLogWater(250)} data-testid="water-250">
+                +250ml
+              </button>
+              <button className="water-btn water-btn-add" type="button" onClick={() => handleLogWater(500)} data-testid="water-500">
+                +500ml
+              </button>
+            </div>
+            <button className="water-btn water-btn-cancel" type="button" onClick={() => setShowWater(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function DashboardNutritionUnused({ mealSections, onOpenAddFood }) {
+  const weekDays = [
+    { id: 'mon', label: 'Mon', date: 18 },
+    { id: 'tue', label: 'Tue', date: 19, active: true, note: 'today' },
+    { id: 'wed', label: 'Wed', date: 20 },
+    { id: 'thu', label: 'Thu', date: 21 },
+    { id: 'fri', label: 'Fri', date: 22 },
+    { id: 'sat', label: 'Sat', date: 23 },
+    { id: 'sun', label: 'Sun', date: 24 },
+  ]
+
+  const consistency = ['hit', 'hit', 'miss', 'hit', 'miss', 'hit', 'hit']
+  const previewMap = { breakfast: 'breakfast', lunch: 'lunch', dinner: 'dinner', snacks: 'snacks' }
+
+  const mealCards = mealSections.map((section) => {
+    const totals = section.items.reduce((sum, item) => ({
+      calories: sum.calories + item.calories,
+      protein: sum.protein + item.protein,
+    }), { calories: 0, protein: 0 })
+
+    return {
+      id: section.id,
+      title: section.title,
+      calories: totals.calories,
+      protein: totals.protein,
+      preview: previewMap[section.id] ?? 'breakfast',
+    }
+  })
+
+  return (
+    <div className="dashboard-view dashboard-view--nutrition screen-fade">
+      <header className="nutrition-header">
+        <div>
+          <h2>Nutrition</h2>
+        </div>
+        <button className="calendar-button" type="button"><Icon name="calendar" /></button>
+      </header>
+      <div className="nutrition-week-strip" role="list" aria-label="Week overview">
+        {weekDays.map((day) => (
+          <button key={day.id} className={`nutrition-week-day${day.active ? ' is-active' : ''}`} type="button" role="listitem">
+            <span>{day.label}</span>
+            <strong>{day.date}</strong>
+            {day.note ? <em>{day.note}</em> : null}
           </button>
         ))}
+      </div>
+
+      <section className="nutrition-section">
+        <div className="nutrition-section__head">
+          <h3>Today&apos;s Meals</h3>
+        </div>
+        <div className="nutrition-meal-list">
+          {mealCards.map((meal) => (
+            <button key={meal.id} className="nutrition-meal-card" type="button" onClick={() => onOpenAddFood(meal.id)}>
+              <MealPreviewArt type={meal.preview} />
+              <span className="nutrition-meal-card__title">{meal.title}</span>
+              <span className="nutrition-meal-card__meta">{meal.calories} kcal • {meal.protein}g P</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="nutrition-section nutrition-section--consistency">
+        <div className="nutrition-section__head">
+          <h3>Consistency</h3>
+          <p>7-day nutrition target streak</p>
+        </div>
+        <div className="consistency-grid" role="list" aria-label="Weekly nutrition consistency">
+          {consistency.map((state, index) => (
+            <span key={`${state}-${index}`} className={`consistency-grid__cell consistency-grid__cell--${state}`} role="listitem" />
+          ))}
+        </div>
       </section>
     </div>
   )
@@ -1387,24 +1561,229 @@ function FoodDetailScreen({ food, selectedPortionId, onSelectPortion, onBack, on
 
 function DashboardFitness() {
   return (
-    <div className="dashboard-view screen-fade">
-      <header className="tab-header">
+    <div className="dashboard-view dashboard-view--fitness screen-fade">
+      <header className="tab-header tab-header--fitness">
         <h2>Fitness</h2>
         <p>Stay consistent with workouts, recovery, and movement streaks.</p>
       </header>
-      <article className="dashboard-card">
-        <h3>Recovery Status</h3>
-        <div className="fitness-metric"><span>Readiness</span><strong>90%</strong></div>
-        <div className="fitness-track"><div className="fitness-track__fill" style={{ width: '90%' }} /></div>
-      </article>
-      <article className="dashboard-card">
-        <h3>This Week</h3>
-        <div className="fitness-grid">
-          <div><strong>4</strong><span>Workouts</span></div>
-          <div><strong>39k</strong><span>Steps</span></div>
-          <div><strong>7.6h</strong><span>Sleep Avg</span></div>
-        </div>
-      </article>
+      <section className="placeholder-page placeholder-page--fitness">
+        <div className="placeholder-icon placeholder-icon--fitness"><Icon name="fitness" /></div>
+        <p className="placeholder-text">
+          Workout tracking coming soon.
+          <br />
+          Log your exercises and track progress.
+        </p>
+        <article className="dashboard-card dashboard-card--fitness-recovery">
+          <span className="card-label">Today&apos;s Recovery</span>
+          <div className="fitness-recovery__value">90%</div>
+          <p>Perfect day for the planned Heavy Legs session.</p>
+        </article>
+      </section>
+    </div>
+  )
+}
+
+const proteinTrendData = [
+  { day: 'Mon', value: 98 },
+  { day: 'Tue', value: 112 },
+  { day: 'Wed', value: 107 },
+  { day: 'Thu', value: 120 },
+  { day: 'Fri', value: 135 },
+  { day: 'Sat', value: 118 },
+  { day: 'Sun', value: 142 },
+]
+
+const sleepCaloriesData = [
+  { sleep: 5.2, excess: 420 },
+  { sleep: 7.5, excess: 60 },
+  { sleep: 5.8, excess: 380 },
+  { sleep: 8.0, excess: 20 },
+  { sleep: 5.5, excess: 410 },
+  { sleep: 7.2, excess: 80 },
+  { sleep: 6.0, excess: 310 },
+  { sleep: 7.8, excess: 40 },
+  { sleep: 5.1, excess: 450 },
+  { sleep: 6.5, excess: 150 },
+  { sleep: 7.0, excess: 90 },
+  { sleep: 5.3, excess: 400 },
+  { sleep: 8.2, excess: 10 },
+  { sleep: 6.8, excess: 120 },
+]
+
+function buildSmoothPath(points) {
+  let path = `M ${points[0].x} ${points[0].y}`
+
+  for (let index = 1; index < points.length; index += 1) {
+    const p0 = points[Math.max(0, index - 2)]
+    const p1 = points[index - 1]
+    const p2 = points[index]
+    const p3 = points[Math.min(points.length - 1, index + 1)]
+    const c1x = p1.x + (p2.x - p0.x) / 6
+    const c1y = p1.y + (p2.y - p0.y) / 6
+    const c2x = p2.x - (p3.x - p1.x) / 6
+    const c2y = p2.y - (p3.y - p1.y) / 6
+    path += ` C ${c1x} ${c1y},${c2x} ${c2y},${p2.x} ${p2.y}`
+  }
+
+  return path
+}
+
+function ProteinTrendChart() {
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const width = 360
+  const height = 140
+  const top = 10
+  const bottom = 28
+  const left = 8
+  const right = 8
+  const values = proteinTrendData.map((point) => point.value)
+  const min = Math.min(...values) - 8
+  const max = Math.max(...values) + 8
+  const plotBottom = height - bottom
+  const step = (width - left - right) / (proteinTrendData.length - 1)
+  const points = proteinTrendData.map((point, index) => ({
+    ...point,
+    x: left + (step * index),
+    y: top + (1 - ((point.value - min) / (max - min))) * (height - top - bottom),
+  }))
+  const linePath = buildSmoothPath(points)
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${plotBottom} L ${points[0].x} ${plotBottom} Z`
+  const hoveredPoint = hoveredIndex === null ? null : points[hoveredIndex]
+  const tooltipLeft = hoveredPoint ? Math.min(92, Math.max(10, (hoveredPoint.x / width) * 100)) : 50
+
+  return (
+    <div className="chart-wrap">
+      <div
+        className={`chart-tooltip${hoveredPoint ? ' is-visible' : ''}`}
+        style={{ left: `${tooltipLeft}%`, top: '2px', transform: 'translateX(-50%)' }}
+      >
+        {hoveredPoint ? `${hoveredPoint.day}: ${hoveredPoint.value}g protein` : ''}
+      </div>
+      <svg className="insights-chart-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="proteinAreaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#8EFF4F" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#8EFF4F" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="proteinLineGradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#4AE87C" />
+            <stop offset="100%" stopColor="#8EFF4F" />
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="110" x2={width} y2="110" className="insights-grid-line" />
+        <line x1="0" y1="75" x2={width} y2="75" className="insights-grid-line" />
+        <line x1="0" y1="40" x2={width} y2="40" className="insights-grid-line" />
+        <path d={areaPath} fill="url(#proteinAreaGradient)" />
+        <path d={linePath} fill="none" stroke="url(#proteinLineGradient)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        {points.map((point, index) => (
+          <circle
+            key={point.day}
+            cx={point.x}
+            cy={point.y}
+            r="4.5"
+            className={`insight-point${hoveredIndex === index ? ' is-visible' : ''}`}
+          />
+        ))}
+        {points.map((point) => (
+          <text key={`${point.day}-label`} x={point.x} y={plotBottom + 18} textAnchor="middle" className="axis-lbl">
+            {point.day}
+          </text>
+        ))}
+        {points.map((point, index) => (
+          <rect
+            key={`${point.day}-hit`}
+            x={point.x - (step / 2)}
+            y={top}
+            width={step}
+            height={height - top - bottom}
+            fill="transparent"
+            className="chart-hit-zone"
+            onMouseEnter={() => setHoveredIndex(index)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          />
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+function SleepCaloriesChart() {
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const width = 360
+  const height = 140
+  const top = 10
+  const bottom = 10
+  const left = 8
+  const right = 8
+  const chartHeight = height - top - bottom
+  const maxExcess = Math.max(...sleepCaloriesData.map((point) => point.excess))
+  const maxSleep = Math.max(...sleepCaloriesData.map((point) => point.sleep))
+  const groupWidth = (width - left - right) / sleepCaloriesData.length
+  const barWidth = Math.min(16, groupWidth * 0.55)
+  const thinWidth = Math.min(9, groupWidth * 0.3)
+  const plotBottom = top + chartHeight
+  const hoveredPoint = hoveredIndex === null ? null : sleepCaloriesData[hoveredIndex]
+  const hoveredX = hoveredIndex === null ? width / 2 : left + (hoveredIndex * groupWidth) + (groupWidth / 2)
+  const tooltipLeft = Math.min(92, Math.max(10, (hoveredX / width) * 100))
+
+  return (
+    <div className="chart-wrap">
+      <div
+        className={`chart-tooltip${hoveredPoint ? ' is-visible' : ''}`}
+        style={{ left: `${tooltipLeft}%`, top: '2px', transform: 'translateX(-50%)' }}
+      >
+        {hoveredPoint ? (
+          <>
+            <span className="chart-tooltip__accent">{hoveredPoint.excess} kcal excess</span>
+            <br />
+            <span className="chart-tooltip__muted">Sleep: {hoveredPoint.sleep}h</span>
+          </>
+        ) : null}
+      </div>
+      <svg className="insights-chart-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+        <line x1="0" y1="110" x2={width} y2="110" className="insights-grid-line" />
+        <line x1="0" y1="75" x2={width} y2="75" className="insights-grid-line" />
+        <line x1="0" y1="40" x2={width} y2="40" className="insights-grid-line" />
+        {sleepCaloriesData.map((point, index) => {
+          const centerX = left + (index * groupWidth) + (groupWidth / 2)
+          const excessHeight = (point.excess / maxExcess) * chartHeight * 0.93
+          const sleepHeight = (point.sleep / maxSleep) * chartHeight * 0.65
+          const isLowSleep = point.sleep < 6
+
+          return (
+            <g key={`${point.sleep}-${point.excess}`}>
+              <rect
+                x={centerX - (barWidth / 2)}
+                y={plotBottom - excessHeight}
+                width={barWidth}
+                height={excessHeight}
+                rx="4"
+                className={`sleep-bar${isLowSleep ? ' sleep-bar--danger' : ''}`}
+                style={{ transformOrigin: `${centerX}px ${plotBottom}px`, animationDelay: `${index * 0.04}s` }}
+              />
+              <rect
+                x={centerX + (barWidth / 2) - (thinWidth / 2) + 2}
+                y={plotBottom - sleepHeight}
+                width={thinWidth}
+                height={sleepHeight}
+                rx="3"
+                className="sleep-bar sleep-bar--sleep"
+                style={{ transformOrigin: `${centerX}px ${plotBottom}px`, animationDelay: `${(index * 0.04) + 0.06}s` }}
+              />
+              <rect
+                x={centerX - (groupWidth / 2)}
+                y={top}
+                width={groupWidth}
+                height={chartHeight}
+                fill="transparent"
+                className="chart-hit-zone"
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              />
+            </g>
+          )
+        })}
+      </svg>
     </div>
   )
 }
@@ -1412,7 +1791,7 @@ function DashboardFitness() {
 function DashboardInsights() {
   return (
     <div className="dashboard-view dashboard-view--insights screen-fade">
-      <header className="tab-header">
+      <header className="tab-header tab-header--insights">
         <h2>Insights</h2>
         <p>Powered by your last 30 days of data.</p>
       </header>
@@ -1424,7 +1803,39 @@ function DashboardInsights() {
       <article className="insight-card">
         <h3>When you sleep <span>&lt; 6 hours</span>, you consume <span>+400 kcal</span>.</h3>
         <div className="bar-chart">{[38, 30, 34, 56, 28, 44].map((value, index) => <div key={value} className="bar-chart__bar"><span style={{ height: `${value}%`, background: index > 2 ? '#ff7c75' : '#304156' }} /></div>)}</div>
-        <button className="insight-link" type="button">Adjust Sleep Schedule</button>
+        <button className="insight-link" type="button">Adjust Sleep Schedule →</button>
+      </article>
+    </div>
+  )
+}
+
+function DashboardInsightsPage() {
+  return (
+    <div className="dashboard-view dashboard-view--insights screen-fade">
+      <header className="tab-header tab-header--insights">
+        <h2>Insights</h2>
+        <p>Powered by your last 30 days of data.</p>
+      </header>
+      <article className="insight-card insight-card--protein scale-in">
+        <div className="insight-title">
+          Protein intake is up <span className="text-lime">12%</span> this week.
+        </div>
+        <ProteinTrendChart />
+        <span className="impact-tag tag-cyan">+ Muscle Synthesis</span>
+      </article>
+      <article className="insight-card scale-in stagger-1">
+        <div className="insight-title">
+          When you sleep <span className="text-coral">&lt; 6 hours</span>, you consume
+          <span className="text-coral"> +400 kcal</span>.
+        </div>
+        <SleepCaloriesChart />
+        <button className="guidance-cta" type="button">
+          Adjust Sleep Schedule
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12,5 19,12 12,19" />
+          </svg>
+        </button>
       </article>
     </div>
   )
@@ -1432,23 +1843,33 @@ function DashboardInsights() {
 
 function DashboardProfile({ profile, goal, activity, diet }) {
   const targetCalories = calculateTargetCalories(profile, goal, activity)
+  const profileTags = [
+    `${goal} goal`,
+    `${diet} nutrition`,
+    `${activity} movement`,
+  ]
 
   return (
-    <div className="dashboard-view screen-fade">
-      <header className="tab-header">
+    <div className="dashboard-view dashboard-view--profile screen-fade">
+      <header className="tab-header tab-header--profile">
         <h2>Profile</h2>
         <p>Your current Health OS calibration.</p>
       </header>
-      <article className="dashboard-card">
+      <article className="dashboard-card dashboard-card--profile-hero">
         <div className="profile-summary">
-          <div className="avatar-badge avatar-badge--large"><span>A</span></div>
-          <div>
+          <div className="avatar-badge avatar-badge--large avatar-badge--profile"><span>A</span></div>
+          <div className="profile-summary__copy">
             <h3>Alex Carter</h3>
-            <p>{goal} goal / {diet} nutrition / {activity} movement</p>
+            <p>Premium Health OS member</p>
           </div>
         </div>
+        <div className="profile-tag-row">
+          {profileTags.map((tag) => (
+            <span key={tag} className="profile-tag">{tag}</span>
+          ))}
+        </div>
       </article>
-      <article className="dashboard-card">
+      <article className="dashboard-card dashboard-card--profile-stats">
         <h3>Body Stats</h3>
         <div className="fitness-grid">
           <div><strong>{profile.weight}kg</strong><span>Weight</span></div>
@@ -1490,7 +1911,7 @@ function DashboardScreen({
   const isImmersiveNutrition = activeTab === 'nutrition' && nutritionView !== 'hub'
   const isFullBleedNutrition = activeTab === 'nutrition' && ['scanner', 'recognition'].includes(nutritionView)
 
-  if (activeTab === 'home') content = <DashboardHome profile={profile} goal={goal} activity={activity} onLogMeal={() => onOpenAddFood('breakfast')} onScanFood={() => onOpenRecognition('lunch')} />
+  if (activeTab === 'home') content = <DashboardHome profile={profile} goal={goal} activity={activity} onLogMeal={() => onOpenAddFood('breakfast')} onScanFood={() => onOpenRecognition('lunch')} onAddWorkout={() => onTabChange('fitness')} />
   else if (activeTab === 'nutrition') {
     if (nutritionView === 'addFood') {
       content = <AddFoodScreen onBack={onCloseNutritionFlow} onQuickAdd={onQuickAddFood} onOpenFoodDetail={onOpenFoodDetail} onOpenScanner={onOpenScanner} />
@@ -1521,7 +1942,7 @@ function DashboardScreen({
     }
   }
   else if (activeTab === 'fitness') content = <DashboardFitness />
-  else if (activeTab === 'insights') content = <DashboardInsights />
+  else if (activeTab === 'insights') content = <DashboardInsightsPage />
   else content = <DashboardProfile profile={profile} goal={goal} activity={activity} diet={diet} />
 
   return (
