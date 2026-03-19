@@ -72,6 +72,10 @@ function Icon({ name }) {
     paleo: <path {...common} d="m14 5 3 3-2.2 2.2 1.4 1.4-1.9 1.9-1.4-1.4-5.7 5.7-2.4-2.4 5.7-5.7-1.4-1.4L11 7.5l1.4 1.4L14 5Zm-1.8 9.2-1.4-1.4" />,
     olive: <path {...common} d="M8 16c0-3.5 2.6-6 5.8-6 2.9 0 5.2 2.1 5.2 5 0 3.3-2.6 5.5-6 5.5-1.8 0-3.4-.5-4.7-1.4M8.6 7.2c3.1 0 4.6 2 4.8 5m-4.8-5c.3-1.9 1.4-3.2 3.2-4.2" />,
     balanced: <path {...common} d="M12 5v14M7 9h10M6 9l-2.5 4.5h5L6 9Zm12 0-2.5 4.5h5L18 9ZM9 5h6" />,
+    settings: <path {...common} d="M12 3.8v2.1m0 12.2v2.1m8.2-8.2h-2.1M5.9 12H3.8m13.9 5.9-1.5-1.5M7.8 7.8 6.3 6.3m11.4 0-1.5 1.5M7.8 16.2l-1.5 1.5M12 15.8a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6Z" />,
+    bell: <path {...common} d="M6.8 16.5h10.4m-8.7 0V10a3.5 3.5 0 1 1 7 0v6.5m-9.1 0h-.9c.6-1 .9-2 .9-3.1V10a5.6 5.6 0 1 1 11.2 0v3.4c0 1.1.3 2.2.9 3.1h-.9m-7 0a1.8 1.8 0 0 0 3.6 0" />,
+    moon: <path {...common} d="M18.2 14.6A7 7 0 1 1 9.4 5.8a5.8 5.8 0 1 0 8.8 8.8Z" />,
+    help: <path {...common} d="M9.6 9.3a2.8 2.8 0 1 1 4.8 2c-.8.8-1.8 1.4-1.8 2.9m-.1 4.1h.1M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />,
   }
 
   return <svg viewBox="0 0 24 24" aria-hidden="true">{icons[name]}</svg>
@@ -1725,19 +1729,37 @@ function DashboardFitness() {
         <h2>Fitness</h2>
         <p>Stay consistent with workouts, recovery, and movement streaks.</p>
       </header>
-      <section className="placeholder-page placeholder-page--fitness">
-        <div className="placeholder-icon placeholder-icon--fitness"><Icon name="fitness" /></div>
-        <p className="placeholder-text">
-          Workout tracking coming soon.
-          <br />
-          Log your exercises and track progress.
-        </p>
-        <article className="dashboard-card dashboard-card--fitness-recovery">
-          <span className="card-label">Today&apos;s Recovery</span>
-          <div className="fitness-recovery__value">90%</div>
-          <p>Perfect day for the planned Heavy Legs session.</p>
-        </article>
-      </section>
+      <article className="dashboard-card dashboard-card--fitness-recovery scale-in">
+        <span className="card-label">Today&apos;s Recovery</span>
+        <div className="fitness-recovery__value">90%</div>
+        <p>Perfect day for the planned Heavy Legs session.</p>
+      </article>
+      <article className="workout-card scale-in stagger-1">
+        <div className="workout-card__icon">
+          <Icon name="fitness" />
+        </div>
+        <div className="workout-card__copy">
+          <strong>Heavy Legs</strong>
+          <span>Squats · Deadlifts · Leg Press</span>
+        </div>
+      </article>
+      <article className="dashboard-card dashboard-card--fitness-stats scale-in stagger-2">
+        <span className="card-label">This Week</span>
+        <div className="fitness-stat-grid">
+          <div>
+            <strong>4</strong>
+            <span>Workouts</span>
+          </div>
+          <div>
+            <strong>2,840</strong>
+            <span>Calories</span>
+          </div>
+          <div>
+            <strong>5.2h</strong>
+            <span>Active</span>
+          </div>
+        </div>
+      </article>
     </div>
   )
 }
@@ -2001,41 +2023,56 @@ function DashboardInsightsPage() {
 }
 
 function DashboardProfile({ profile, goal, activity, diet }) {
-  const targetCalories = calculateTargetCalories(profile, goal, activity)
-  const profileTags = [
-    `${goal} goal`,
-    `${diet} nutrition`,
-    `${activity} movement`,
-  ]
-
   return (
     <div className="dashboard-view dashboard-view--profile screen-fade">
       <header className="tab-header tab-header--profile">
         <h2>Profile</h2>
         <p>Your current Health OS calibration.</p>
       </header>
-      <article className="dashboard-card dashboard-card--profile-hero">
-        <div className="profile-summary">
-          <div className="avatar-badge avatar-badge--large avatar-badge--profile"><span>A</span></div>
-          <div className="profile-summary__copy">
-            <h3>Alex Carter</h3>
-            <p>Premium Health OS member</p>
+      <article className="dashboard-card dashboard-card--profile-member scale-in">
+        <div className="profile-member-card">
+          <div className="avatar-ring avatar-ring--home profile-member-card__avatar">
+            <div className="avatar-inner" />
+          </div>
+          <div className="profile-member-card__copy">
+            <strong>Alex</strong>
+            <span>Premium Member</span>
           </div>
         </div>
-        <div className="profile-tag-row">
-          {profileTags.map((tag) => (
-            <span key={tag} className="profile-tag">{tag}</span>
-          ))}
+      </article>
+      <article className="dashboard-card dashboard-card--profile-goals scale-in stagger-1">
+        <span className="card-label">Daily Goals</span>
+        <div className="profile-goals-grid">
+          <div>
+            <strong>2150</strong>
+            <span>Calories</span>
+          </div>
+          <div>
+            <strong>150g</strong>
+            <span>Protein</span>
+          </div>
+          <div>
+            <strong>200g</strong>
+            <span>Carbs</span>
+          </div>
+          <div>
+            <strong>60g</strong>
+            <span>Fat</span>
+          </div>
         </div>
       </article>
-      <article className="dashboard-card dashboard-card--profile-stats">
-        <h3>Body Stats</h3>
-        <div className="fitness-grid">
-          <div><strong>{profile.weight}kg</strong><span>Weight</span></div>
-          <div><strong>{profile.height}cm</strong><span>Height</span></div>
-          <div><strong>{profile.age}</strong><span>Age</span></div>
-        </div>
-        <div className="fitness-metric"><span>Daily target</span><strong>{targetCalories} kcal</strong></div>
+      <article className="dashboard-card dashboard-card--profile-menu scale-in stagger-2">
+        {[
+          ['settings', 'Settings'],
+          ['bell', 'Notifications'],
+          ['moon', 'Appearance'],
+          ['help', 'Help & Support'],
+        ].map(([icon, label]) => (
+          <button key={label} className="profile-menu-row" type="button">
+            <span className="profile-menu-row__icon"><Icon name={icon} /></span>
+            <span>{label}</span>
+          </button>
+        ))}
       </article>
     </div>
   )
@@ -2080,16 +2117,16 @@ function DashboardScreen({
     } else if (nutritionView === 'recognition') {
       content = <RecognitionScreen onBack={onCloseRecognitionFlow} onConfirm={onConfirmRecognition} />
     } else if (nutritionView === 'food-detail') {
-        content = (
-          <FoodDetailScreen
-            food={selectedFood}
-            selectedPortionId={selectedPortionId}
-            onSelectPortion={onSelectPortion}
-            onBack={onCloseNutritionFlow}
-            onLogFood={onLogFood}
-            showLogButton={nutritionReturnView !== 'hub'}
-          />
-        )
+      content = (
+        <FoodDetailScreen
+          food={selectedFood}
+          selectedPortionId={selectedPortionId}
+          onSelectPortion={onSelectPortion}
+          onBack={onCloseNutritionFlow}
+          onLogFood={onLogFood}
+          showLogButton={nutritionReturnView !== 'hub'}
+        />
+      )
     } else {
       content = (
         <DashboardNutrition
@@ -2369,4 +2406,3 @@ function App() {
 }
 
 export default App
-

@@ -30,9 +30,7 @@
 .phone-screen--flow,
 .phone-screen--dashboard {
   padding:
-    max(16px, calc(env(safe-area-inset-top) + 8px))
-    16px
-    max(18px, env(safe-area-inset-bottom));
+    max(16px, calc(env(safe-area-inset-top) + 8px)) 16px max(18px, env(safe-area-inset-bottom));
 }
 
 .phone-screen--flow {
@@ -86,6 +84,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -177,7 +176,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
-.primary-button > span {
+.primary-button>span {
   position: relative;
   z-index: 2;
 }
@@ -216,6 +215,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -658,28 +658,28 @@
   position: relative;
   z-index: 1;
   border-radius: 50%;
-  background: conic-gradient(
-    from -92deg,
-    #8dff44 0deg,
-    #c7ff56 52deg,
-    #fff08b 116deg,
-    #ffd48f 178deg,
-    #ffac7f 236deg,
-    #ff8e79 286deg,
-    #8dff44 360deg
-  );
+  background: conic-gradient(from -92deg,
+      #8dff44 0deg,
+      #c7ff56 52deg,
+      #fff08b 116deg,
+      #ffd48f 178deg,
+      #ffac7f 236deg,
+      #ff8e79 286deg,
+      #8dff44 360deg);
   mask: radial-gradient(circle, transparent 42%, #000 43%);
   filter:
-    saturate(1.05)
-    blur(0.18px)
-    drop-shadow(0 0 18px rgba(182, 255, 84, 0.18))
-    drop-shadow(0 0 28px rgba(255, 142, 121, 0.12));
+    saturate(1.05) blur(0.18px) drop-shadow(0 0 18px rgba(182, 255, 84, 0.18)) drop-shadow(0 0 28px rgba(255, 142, 121, 0.12));
   animation: spin-ring 7s linear infinite;
 }
 
 @keyframes spin-ring {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .result-wave {
@@ -760,9 +760,17 @@
   color: #10150d;
 }
 
-.macro-chip--protein { background: #a8ff4f; }
-.macro-chip--carbs { background: #43d7f3; }
-.macro-chip--fats { background: #ff7d71; }
+.macro-chip--protein {
+  background: #a8ff4f;
+}
+
+.macro-chip--carbs {
+  background: #43d7f3;
+}
+
+.macro-chip--fats {
+  background: #ff7d71;
+}
 
 .dashboard-shell {
   height: calc(100dvh - max(16px, calc(env(safe-area-inset-top) + 8px)) - max(18px, env(safe-area-inset-bottom)));
@@ -776,9 +784,7 @@
 
 .dashboard-shell--full-bleed {
   margin:
-    calc(-1 * max(16px, calc(env(safe-area-inset-top) + 8px)))
-    -16px
-    calc(-1 * max(18px, env(safe-area-inset-bottom)));
+    calc(-1 * max(16px, calc(env(safe-area-inset-top) + 8px))) -16px calc(-1 * max(18px, env(safe-area-inset-bottom)));
 }
 
 .dashboard-scroll {
@@ -1242,10 +1248,18 @@
   border-radius: inherit;
 }
 
-.macro-breakdown__fill--protein { background: #2ec4ea; }
-.macro-breakdown__fill--carbs { background: #96ff41; }
+.macro-breakdown__fill--protein {
+  background: #2ec4ea;
+}
+
+.macro-breakdown__fill--carbs {
+  background: #96ff41;
+}
+
 .macro-breakdown__fill--fats,
-.fitness-track__fill { background: #ff7d71; }
+.fitness-track__fill {
+  background: #ff7d71;
+}
 
 .plan-item {
   display: grid;
@@ -1255,7 +1269,7 @@
   align-items: start;
 }
 
-.plan-item + .plan-item {
+.plan-item+.plan-item {
   margin-top: 12px;
 }
 
@@ -1293,7 +1307,7 @@
   align-items: flex-start;
 }
 
-.coaching-tip + .coaching-tip {
+.coaching-tip+.coaching-tip {
   margin-top: 12px;
 }
 
@@ -1456,6 +1470,90 @@
   color: rgba(214, 224, 236, 0.66);
   font-size: 0.92rem;
   line-height: 1.42;
+}
+
+.workout-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(142, 255, 79, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(142, 255, 79, 0.12), rgba(0, 212, 170, 0.08));
+}
+
+.workout-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #8eff4f;
+}
+
+.workout-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workout-card__copy strong {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.workout-card__copy span {
+  color: rgba(214, 224, 236, 0.66);
+  font-size: 0.82rem;
+}
+
+.dashboard-card--fitness-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fitness-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  text-align: center;
+}
+
+.fitness-stat-grid div {
+  padding: 12px 10px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.fitness-stat-grid strong {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.fitness-stat-grid div:nth-child(1) strong {
+  color: #8eff4f;
+}
+
+.fitness-stat-grid div:nth-child(2) strong {
+  color: #4fc3f7;
+}
+
+.fitness-stat-grid div:nth-child(3) strong {
+  color: #c084fc;
+}
+
+.fitness-stat-grid span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(214, 224, 236, 0.66);
+  font-size: 0.72rem;
 }
 
 .water-modal-overlay {
@@ -1984,7 +2082,7 @@
   padding: 0 14px;
 }
 
-.food-row + .food-row {
+.food-row+.food-row {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -2039,9 +2137,11 @@
   0% {
     transform: scale(0.88);
   }
+
   55% {
     transform: scale(1.08);
   }
+
   100% {
     transform: scale(1);
   }
@@ -2295,9 +2395,7 @@
 .recognition-screen {
   position: relative;
   margin:
-    calc(-1 * max(16px, calc(env(safe-area-inset-top) + 8px)))
-    -16px
-    calc(-1 * max(18px, env(safe-area-inset-bottom)));
+    calc(-1 * max(16px, calc(env(safe-area-inset-top) + 8px))) -16px calc(-1 * max(18px, env(safe-area-inset-bottom)));
   min-height: 100dvh;
   overflow: hidden;
   background: #0b1016;
@@ -2438,9 +2536,12 @@
 }
 
 @keyframes scanner-line {
-  0%, 100% {
+
+  0%,
+  100% {
     top: 18%;
   }
+
   50% {
     top: 68%;
   }
@@ -2464,9 +2565,12 @@
 }
 
 @keyframes scanner-breathe {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.82;
   }
+
   50% {
     opacity: 1;
   }
@@ -2806,6 +2910,124 @@
   gap: 14px;
 }
 
+.dashboard-card--profile-member,
+.dashboard-card--profile-goals,
+.dashboard-card--profile-menu {
+  border-color: rgba(99, 130, 164, 0.2);
+}
+
+.profile-member-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-member-card__avatar {
+  width: 54px;
+  height: 54px;
+  margin-top: 0;
+}
+
+.profile-member-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.profile-member-card__copy strong {
+  color: #fff;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.profile-member-card__copy span {
+  color: rgba(214, 224, 236, 0.66);
+  font-size: 0.82rem;
+}
+
+.profile-goals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  text-align: center;
+}
+
+.profile-goals-grid strong {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.profile-goals-grid div:nth-child(1) strong {
+  color: #8eff4f;
+}
+
+.profile-goals-grid div:nth-child(2) strong {
+  color: #4fc3f7;
+}
+
+.profile-goals-grid div:nth-child(3) strong {
+  color: #8eff4f;
+}
+
+.profile-goals-grid div:nth-child(4) strong {
+  color: #ff6b6b;
+}
+
+.profile-goals-grid span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(214, 224, 236, 0.66);
+  font-size: 0.68rem;
+}
+
+.dashboard-card--profile-menu {
+  padding: 0;
+  overflow: hidden;
+}
+
+.profile-menu-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.profile-menu-row:last-child {
+  border-bottom: 0;
+}
+
+.profile-menu-row:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.profile-menu-row__icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(214, 224, 236, 0.66);
+}
+
+.profile-menu-row__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
 .profile-summary__copy {
   display: flex;
   flex-direction: column;
@@ -2883,6 +3105,7 @@
 }
 
 @media (max-width: 380px) {
+
   .phone-screen--welcome,
   .phone-screen--flow,
   .phone-screen--dashboard {
@@ -2956,6 +3179,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .screen-fade,
   .result-ring,
   .primary-button--shiny::before,
