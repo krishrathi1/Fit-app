@@ -394,7 +394,7 @@ Add Button per Section: A subtle text button aligned right of the section header
 Food Item Cards (The Entries):
 
 Styling: height: 72px, Deep Indigo (#1E2A38), border-radius: 16px, margin-bottom: 8px.
-
+ 
 Left Side (Details): * Food Name: "Grilled Chicken Breast" (Inter, 16px, Medium, White).
 
 Serving: "150g" (Inter, 13px, Muted Gray).
@@ -410,3 +410,444 @@ Gesture System (The Micro-interactions):
 Swipe Right (Duplicate): Swiping the card right reveals a Fresh Green (#2ED573) background with a white "Copy" icon. Releasing triggers a haptic snap, instantly duplicating the item for quick meal repetition.
 
 Swipe Left (Delete): Swiping left reveals a Warm Coral (#FF6B6B) background with a white "Trash" icon. Releasing deletes the item with a smooth shrinking exit animation.
+
+Screen 11: Add Food (The Speed Hub)
+Purpose: The single biggest drop-off point in health apps is how long it takes to log a meal. This screen prioritizes speed and muscle memory.
+
+Top Navigation & Search:
+
+Spacing: padding-top: 24px.
+
+Search Bar: A large, highly visible input field. height: 56px, border-radius: 16px. Background is slightly lighter than the app background (rgba(255,255,255,0.08)).
+
+Focus State: Auto-focuses on entry. The border glows with a 1px Electric Lime ring.
+
+Trailing Icon: A barcode scanner icon. Tapping it instantly opens the camera.
+
+Navigation Tabs (The Segmented Control):
+
+Layout: A horizontal, scrollable list of pill-shaped tabs directly below the search bar. margin-top: 16px.
+
+Tabs: "Recent", "Frequent", "Saved Meals", "Recipes".
+
+Active State: The active tab is solid White with Soft Charcoal text. Inactive tabs are transparent with Muted Gray text.
+
+List Layout (Populated Data):
+
+Items: Clean list view. No bulky cards here to maximize screen real estate.
+
+Quick Add Action: Every item in the list has a 32x32px circular "+" button on the far right. Tapping it adds the food instantly without opening the detail screen, accompanied by a subtle success checkmark animation.
+
+Screen 12: Food Detail (The Intelligence View)
+Purpose: When a user taps into a specific food, they aren't just looking for numbers; they want to understand its impact on their OS.
+
+Top Layout (Hero Section):
+
+Image: A premium, dark-gradient masked image of the food item at the top (if available), smoothly fading into the Soft Charcoal background.
+
+Title: "Avocado Toast with Egg" (SF Pro Display, 32px, Bold, White).
+
+Portion Selector: A sleek, inline horizontal scroller for sizes (e.g., "1 Slice", "100g", "Custom").
+
+Macro Visualization (The Radial Graph):
+
+Spacing: margin-top: 32px, centered.
+
+Design: Inspired by Apple Watch activity rings but unified into a single, elegant 3-part segmented donut chart.
+
+Ring Segments: Cyan (#06B6D4) for Protein, Electric Lime (#8EFF4F) for Carbs, Warm Coral (#FF6B6B) for Fat. The ring has a beautiful neon glow effect (filter: drop-shadow).
+
+Center Data: "340" (SF Pro, 48px, Bold) stacked above "Calories" (Inter, 14px, Muted Gray).
+
+Nutrition Breakdown (The Grid):
+
+Layout: A 2-column masonry grid below the radial graph. margin-top: 32px, gap: 12px.
+
+Grid Cards: Small glassmorphic tiles (height: 72px, Deep Indigo background).
+
+Card Content:
+
+Protein: "22g" (Cyan, 20px) / "Protein" (Gray, 12px)
+
+Carbs: "28g" (Lime, 20px) / "Carbs" (Gray, 12px)
+
+Fat: "16g" (Coral, 20px) / "Fat" (Gray, 12px)
+
+Fiber: "8g" (White, 20px) / "Fiber" (Gray, 12px)
+
+Sodium: "450mg" (White, 20px) / "Sodium" (Gray, 12px)
+
+Bottom (The Action):
+
+Floating CTA: Locked to the bottom safe area. Full-width Electric Lime button. "Log Food".
+
+Intelligent Subtext: Directly above the button, a small AI insight text: "This will hit 100% of your daily fiber goal." (Inter, 13px, Cyan).
+
+Screen 13: Barcode Scanner (The Precision Tool)
+Purpose: Instantaneous capture. It shouldn't feel like a separate screen; it should feel like a native, high-end optical tool.
+
+Top Navigation (Overlay):
+
+Layout: Floating over the live camera feed.
+
+Controls: A 40x40px glassmorphic rgba(0,0,0,0.4) back chevron on the left. A flashlight toggle on the right.
+
+Main Content (The Viewfinder):
+
+Background: Full-screen live camera feed.
+
+The Mask: A dark, translucent overlay (rgba(15, 18, 22, 0.6)) covers the screen, with a clear, rounded rectangle cut out in the dead center.
+
+The Reticle (Frame): The cutout is framed by four sleek, Electric Lime (#8EFF4F) corner brackets (border-radius: 8px, stroke-width: 3px).
+
+Dynamic AI Feedback:
+
+Animation: A soft, Electric Lime gradient line smoothly scans up and down inside the reticle frame.
+
+Text: Centered below the reticle. "Scanning food..." (Inter, 16px, Medium, Pure White). The text has a subtle, breathing opacity loop to indicate active searching.
+
+Haptics: As soon as a barcode is detected, the scan line snaps to it, the device gives a sharp, heavy haptic thud, and instantly transitions to the Food Detail screen. No confirmation tap required.
+
+Bottom Action:
+
+Fallback: A subtle text button at the bottom: "Enter Manually" (Inter, 14px, Muted Gray rgba(255,255,255,0.6)).
+
+Screen 14: AI Food Recognition (The "Magic" Moment)
+Purpose: To make logging a multi-item plate as easy as taking a photo for Instagram. This is the ultimate "Intelligent Guidance" flex.
+
+Phase 1: The Capture & Processing:
+
+User snaps the photo. The image freezes and takes up the top 60% of the screen.
+
+Animation: Small, glowing Cyan (#06B6D4) rings pulse over the different food items in the image, connected by thin, futuristic bezier lines as the AI "thinks".
+
+Phase 2: The Results (Bottom Sheet):
+
+Layout: A Deep Indigo (#1E2A38) glassmorphic sheet smoothly slides up from the bottom, occupying the lower 40% of the screen. border-top-radius: 32px, backdrop-filter: blur(24px).
+
+Sheet Header: A subtle 40px wide pill handle at the very top. Below it: "Detected on plate" (SF Pro, 20px, Bold, White).
+
+Detected Items List:
+
+Layout: A clean, vertical list of the identified items with high visual hierarchy. margin-top: 16px.
+
+Item Rows:
+
+Left: "Chicken Breast" (Inter, 16px, Medium, White) • "150g est." (Inter, 13px, Cyan).
+
+Right: A minimalist toggle switch (currently ON, Electric Lime) so the user can easily deselect an item if the AI caught a garnish they don't want to track.
+
+Visual tie-in: Tapping an item in the list briefly flashes the corresponding glowing ring on the photo above.
+
+(Other rows follow: "White Rice" • "100g est.", "Steamed Broccoli" • "80g est.")
+
+Bottom (The Action):
+
+CTA Button: Floating above the bottom edge. Full-width Electric Lime button. "Confirm & Log (3 Items)".
+
+Screen 15: Meal Builder (The Power-User Engine)
+Purpose: Turn frequent behaviors into one-tap templates. This screen needs to balance robust data inputs with a clean, uncrowded aesthetic.
+
+Top Navigation:
+
+Header: Back chevron top left. "Create Meal" (SF Pro Display, 24px, Bold) top center.
+
+Hero Section (The Dynamic Aggregator):
+
+Layout: A premium Deep Indigo card at the very top. This acts as the "receipt" that updates in real-time.
+
+Meal Name Input: A large, borderless input field. Placeholder: "Name your meal..." (SF Pro, 28px, Bold, Muted Gray). When typed, text is Pure White. e.g., "Chicken + Rice Bowl".
+
+Aggregated Stats: Below the title, the total stats.
+
+Hero Number: "450" (SF Pro, 40px, Bold, Electric Lime) stacked next to "kcal" (Inter, 14px, Muted Gray).
+
+Macro Rollup: A minimalist horizontal bar showing the combined P/C/F split, with text below: "45g P • 40g C • 12g F".
+
+Animation: When a new food is added below, these numbers spin like a digital odometer to the new total.
+
+Ingredients List (The Building Blocks):
+
+Section Header: "Ingredients" (Inter, 14px, Semi-bold, Muted Gray). margin-top: 32px.
+
+List Items: Minimalist rows mirroring the Food Diary layout (Screen 10). Clean typography, Swipe-to-delete enabled.
+
+Add Button: A dashed-border, transparent button: "+ Add Ingredient" (Inter, 16px, Cyan). Tapping this slides over to Screen 11 (Add Food).
+
+Bottom (The Investment):
+
+Spacing: Locked to the bottom safe area.
+
+CTA Button: Full-width button with a smooth Cyan to Electric Lime gradient. "Save as Template".
+
+Intelligent Subtext: "This will be available in your 'Saved Meals' for 1-tap logging." (Inter, 12px, Muted Gray).
+
+Screen 16: Recipe Explorer (The Inspiration Engine)
+Purpose: A visually immersive cookbook that feels like a premium editorial magazine, cross-referenced with their specific macro goals.
+
+Top Navigation:
+
+Header: "Discover" (SF Pro Display, 32px, Bold, Pure White).
+
+Trailing Icons: A minimal search glass icon and a slider/filter icon (rgba(255,255,255,0.8)).
+
+Category Tabs (Horizontal Scroll):
+
+Spacing: margin-top: 24px.
+
+Pills: "High Protein", "Low Carb", "Quick Meals", "Vegan".
+
+Active State: The selected pill is Solid White with Soft Charcoal text. Inactive pills are transparent with a 1px translucent border and Muted Gray text.
+
+Featured Recipe (The Hero Card):
+
+Layout: A massive, beautiful card dominating the top half of the scroll. height: 340px, border-radius: 24px.
+
+Visual: A high-resolution, dark-mood culinary photo spanning the entire card.
+
+Overlay: A smooth linear gradient from bottom (100% Soft Charcoal) to top (0% transparent).
+
+Content (Bottom aligned):
+
+Smart Tag: "✨ Perfect for your protein goal" (Inter, 12px, Cyan background at 15% opacity, Cyan text).
+
+Title: "Spicy Salmon Crunch Bowl" (SF Pro, 28px, Bold, White).
+
+Metrics: "450 kcal • 42g Protein • 15 min prep" (Inter, 14px, Muted Gray).
+
+Scrolling Recipe Feed (The Grid):
+
+Layout: A horizontal carousel of smaller recipe cards below the Hero section. margin-top: 32px.
+
+Card Styling: width: 200px, height: 240px, Deep Indigo background. Image takes up the top 60%, text takes up the bottom 40%.
+
+Micro-interaction: Pressing a card scales it down slightly (0.98) before smoothly expanding it into the full-screen Recipe Detail view.
+
+Screen 17: Grocery Planner (The Execution Tool)
+Purpose: Transform the abstract "meal plan" into a highly actionable, frictionless real-world tool. It categorizes items exactly how a user walks through a supermarket.
+
+Top Navigation:
+
+Header: "Grocery List" (SF Pro Display, 32px, Bold).
+
+Subtext: "Auto-generated for this week's plan." (Inter, 14px, Electric Lime).
+
+Progress Bar (Gamification):
+
+A sleek, thin progress bar under the header showing how many items are checked off. (e.g., 4/15 items).
+
+Categorized List Layout (Aisle-Based):
+
+Instead of a chaotic single list, group items by supermarket sections.
+
+Section Header: "Produce" (Inter, 16px, Semi-bold, Muted Gray). margin-top: 24px.
+
+The Checkbox UI (Elite Detail):
+
+Layout: Deep Indigo glassmorphic row (height: 56px, border-radius: 16px, margin-bottom: 8px).
+
+Left (The Box): A 24x24px rounded square (border-radius: 6px, 2px Deep Indigo border).
+
+Text: "Spinach" / "Avocado" (Inter, 16px, White).
+
+Right (Quantity): "2 bags" / "3 large" (Inter, 14px, Muted Gray).
+
+Interaction (The Magic): When the user taps the row, the checkbox fills with Electric Lime (#8EFF4F), a crisp white checkmark appears, a satisfying haptic tick fires, and the text gets a smooth 0.3s strikethrough animation while dimming to 40% opacity.
+
+Other Sections (Follow same UI):
+
+Meat & Poultry: Chicken (1.5 kg)
+
+Dairy: Eggs (1 dozen)
+
+Pantry: Rice (1 kg bag)
+
+Floating Action:
+
+A circular Floating Action Button (FAB) locked to the bottom right. Electric Lime background, Soft Charcoal "+" icon to quickly add custom household items.
+
+Screen 18: Fitness Hub (The Movement Dashboard)
+Purpose: A dramatic shift in context from Nutrition to Exertion. This is the central command for physical performance, utilizing the "Intelligent Guidance" philosophy.
+
+Top Navigation:
+
+Header: "Fitness" (SF Pro Display, 32px, Bold).
+
+Trailing Icon: An Apple Watch/Wearable sync icon pulsing subtly in the top right to assure the user their data is live.
+
+Hero Card: The Fitness Score (The Differentiator):
+
+Instead of just showing "workouts done," we give them a unified OS health metric.
+
+Layout: Large Deep Indigo card (padding: 24px, border-radius: 24px).
+
+Visual: A beautiful, glowing half-gauge (speedometer style) in the center. The gradient sweeps from Warm Coral (low) to Cyan (medium) to Electric Lime (high).
+
+Center Data: "84" (SF Pro, 64px, Heavy, Pure White).
+
+Subtext: "Optimal Recovery & Output." (Inter, 14px, Electric Lime).
+
+Secondary Cards (The 2x2 Grid):
+
+Spacing: gap: 16px, margin-top: 16px.
+
+Card 1 (Steps):
+
+Styling: Deep Indigo, square card.
+
+Header: "Steps" (Muted Gray, 13px) + Footprint icon.
+
+Data: "8,432" (White, 24px, Bold).
+
+Intelligent Subtext: "Just 1,500 more. A 15-min walk hits your goal." (Inter, 12px, Cyan).
+
+Card 2 (Calories Burned):
+
+Styling: Deep Indigo, square card.
+
+Header: "Active Burn" (Muted Gray, 13px) + Flame icon.
+
+Data: "420 kcal" (Warm Coral, 24px, Bold).
+
+Visual: A minimalist mini-bar chart at the bottom of the card showing the burn distribution over the last 6 hours.
+
+Card 3 (Workouts - The Action Area):
+
+Layout: Full-width card below the grid.
+
+Header: "Today's Plan" (Inter, 16px, Semi-bold).
+
+Content: "Upper Body Hypertrophy • 45 mins" (White, 16px).
+
+Button: A sleek, pill-shaped "Start Session" button inside the card. Cyan border, transparent background. When tapped, it fills with solid Cyan to transition into the workout flow.
+
+Screen 19: Workout Library (The Blueprint Hub)
+Purpose: A highly organized, visually stimulating command center for physical training. It should feel like browsing a premium masterclass.
+
+Top Navigation:
+
+Header: "Training" (SF Pro Display, 32px, Bold, Pure White).
+
+Trailing Icons: A sleek search icon and a "Filter" slider icon (Inter, 24x24px, outline style).
+
+Category Navigation (The Bento Grid):
+
+Layout: A 2x2 masonry grid dominating the top section (margin-top: 24px, gap: 12px).
+
+Cards (Strength, Cardio, Mobility, HIIT):
+
+Styling: height: 100px, border-radius: 20px.
+
+Visuals: Instead of photos, use high-end abstract 3D glass renders on Deep Indigo backgrounds. (e.g., A glowing Cyan metallic sphere for Strength, overlapping vibrant rings for Cardio, fluid waves for Mobility).
+
+Text: Positioned bottom-left of each card. (SF Pro, 18px, Semi-bold).
+
+"For You" Section (Intelligent Guidance):
+
+Spacing: margin-top: 32px.
+
+Header: "Recommended Today" (Inter, 16px, Semi-bold, Muted Gray).
+
+Hero Card: A wide, cinematic card (height: 200px).
+
+Background: A dark, moody gym photo, faded heavily into the Charcoal background.
+
+Content: "Heavy Push Day" (SF Pro, 24px, Bold) • "Based on your recovery score." (Inter, 13px, Electric Lime).
+
+UI Behavior: Scrolling feels weighty and smooth. Tapping a category instantly filters the list below with a fluid layout animation (Shared Element Transition).
+
+Screen 20: Workout Detail (The Mission Briefing)
+Purpose: Prepare the user mentally and physically before they hit start. Clear expectations, zero surprises.
+
+Top Layout (The Hero Banner):
+
+Visual: A full-bleed cinematic image or a subtle, slow-motion looping video of the targeted muscle group at the top.
+
+Header: "Upper Body Power" (SF Pro Display, 32px, Heavy, Pure White) overlapping the bottom edge of the image.
+
+The Metrics Row (Quick Glance):
+
+Layout: A horizontal glassmorphic pill bar just below the header (margin-top: 16px, padding: 16px, Deep Indigo).
+
+Data Points (Split into 3 columns):
+
+Time: "45 Min" (White, 16px) / "Duration" (Gray, 12px).
+
+Burn: "350 kcal" (Cyan, 16px) / "Est. Burn" (Gray, 12px).
+
+Level: "Intense" (Warm Coral, 16px) / "Intensity" (Gray, 12px).
+
+Exercise List (The Flight Plan):
+
+Spacing: margin-top: 32px.
+
+Layout: A vertical timeline-style list. A thin dashed line connects each exercise vertically down the left side, indicating flow.
+
+Exercise Rows:
+
+Left (The Node): A glowing Electric Lime dot on the dashed line.
+
+Middle (The Details): "Barbell Bench Press" (Inter, 18px, Medium). Below it: "4 Sets • 8-10 Reps" (Inter, 14px, Muted Gray).
+
+Right (The Visual): A small 48x48px thumbnail showing a wireframe animation of the movement.
+
+Bottom (The Commitment):
+
+Floating Action Area: Deep gradient fade at the bottom.
+
+CTA Button: Massive, pulsing Cyan to Electric Lime gradient button: "Begin Session".
+
+Micro-interaction: Pressing it triggers a 3-second countdown overlay ("3... 2... 1... GO") with escalating haptic heartbeats.
+
+Screen 21: Workout Logging (The Arena)
+Purpose: This screen is designed for sweaty fingers and physical exhaustion. Touch targets are 30% larger than standard screens. Data entry must take less than 2 seconds per set.
+
+Top Navigation (Active State):
+
+Layout: Locked to the top. Deep Indigo, solid background (no blur, saves battery during active workouts).
+
+Center: A running timer "00:14:23" (SF Pro Monospaced, 20px, Cyan).
+
+Right: "Finish" (Inter, 16px, Warm Coral—requires a long-press to avoid accidental taps).
+
+Current Exercise Header:
+
+Title: "Barbell Bench Press" (SF Pro Display, 28px, Bold).
+
+Intelligent Guidance Subtext: "Last week: 60kg for 8 reps. Aim for 65kg today." (Inter, 14px, Electric Lime).
+
+Logging UI (The Set Matrix):
+
+Layout: A clean spreadsheet-style list of large, rounded rows (margin-top: 24px).
+
+Column Headers: "Set" | "Previous" | "kg" | "Reps" | "Done"
+
+Active Row (e.g., Set 1):
+
+Styling: height: 64px, border-radius: 16px, background: rgba(255,255,255,0.05).
+
+Set #: "1" (Inter, 16px, White).
+
+Previous: "60 x 8" (Inter, 14px, Muted Gray).
+
+Inputs (kg & Reps): Huge touch areas. Instead of invoking the native iOS keyboard (which is awful for gym use), tapping an input slides up a custom, massive, minimalist Number Pad from the bottom of the screen.
+
+Values: "60" [kg] and "8" [reps] pre-filled based on last week. User just taps to confirm or edits.
+
+The "Done" Button: A large circular checkbox on the far right.
+
+Interaction (The Dopamine Hit):
+
+When the user taps the circular checkbox, it fills with solid Electric Lime.
+
+The text in the row turns bright white, confirming the log.
+
+A heavy, satisfying haptic SNAP fires.
+
+A subtle rest timer (e.g., "90s Rest") automatically drops down below the completed row and begins counting down.
+
+Bottom Actions:
+
+Layout: Two large ghost buttons below the sets.
+
+" + Add Set" (Left) and "Next Exercise →" (Right, highlights in Cyan when all sets are logged).
