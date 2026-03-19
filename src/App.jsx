@@ -107,6 +107,152 @@ function AtomLogo() {
   )
 }
 
+function HeartbeatWave() {
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const waveFrame = canvas?.parentElement
+    const ringWrap = waveFrame?.parentElement
+    const context = canvas?.getContext('2d')
+
+    if (!canvas || !waveFrame || !ringWrap || !context) return undefined
+
+    let animationFrame = 0
+    let tick = 0
+    let width = 0
+    let height = 0
+    let ringOuter = 0
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    function ecgShape(time) {
+      if (time < 0.1) return 0
+
+      if (time < 0.2) {
+        const phase = (time - 0.1) / 0.1
+        return -Math.sin(phase * Math.PI) * 5
+      }
+
+      if (time < 0.28) return 0
+
+      if (time < 0.32) {
+        const phase = (time - 0.28) / 0.04
+        return Math.sin((phase * Math.PI) / 2) * 7
+      }
+
+      if (time < 0.38) {
+        const phase = (time - 0.32) / 0.06
+        return 7 - Math.sin((phase * Math.PI) / 2) * 55
+      }
+
+      if (time < 0.44) {
+        const phase = (time - 0.38) / 0.06
+        return -48 + Math.sin((phase * Math.PI) / 2) * 56
+      }
+
+      if (time < 0.5) return -2
+
+      if (time < 0.68) {
+        const phase = (time - 0.5) / 0.18
+        return -Math.sin(phase * Math.PI) * 13 - 2
+      }
+
+      return 0
+    }
+
+    function getEcg(phase, period) {
+      const normalizedPhase = (((phase % period) + period) % period) / period
+      return ecgShape(normalizedPhase)
+    }
+
+    function resize() {
+      const frameRect = waveFrame.getBoundingClientRect()
+      const wrapRect = ringWrap.getBoundingClientRect()
+      const pixelRatio = window.devicePixelRatio || 1
+
+      width = Math.round(frameRect.width)
+      height = Math.round(frameRect.height)
+      ringOuter = wrapRect.width / 2
+
+      canvas.width = Math.round(width * pixelRatio)
+      canvas.height = Math.round(height * pixelRatio)
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    }
+
+    function drawWave(xStart, xEnd, color, side) {
+      const centerY = height / 2
+      const centerX = width / 2
+      const period = 100
+      const speed = 1.4
+      const gradient = context.createLinearGradient(xStart, 0, xEnd, 0)
+
+      if (side === 'left') {
+        gradient.addColorStop(0, 'rgba(166, 255, 69, 0)')
+        gradient.addColorStop(0.55, 'rgba(166, 255, 69, 0.68)')
+        gradient.addColorStop(1, color)
+      } else {
+        gradient.addColorStop(0, color)
+        gradient.addColorStop(0.45, 'rgba(255, 124, 117, 0.68)')
+        gradient.addColorStop(1, 'rgba(255, 124, 117, 0)')
+      }
+
+      context.beginPath()
+      context.strokeStyle = gradient
+      context.lineWidth = 1.7
+      context.lineCap = 'round'
+      context.lineJoin = 'round'
+
+      for (let x = xStart; x <= xEnd; x += 1) {
+        const phase = side === 'left'
+          ? (centerX - ringOuter + 8 - x) + tick * speed
+          : (x - (centerX + ringOuter - 8)) + tick * speed
+        const y = centerY + getEcg(phase, period)
+
+        if (x === xStart) context.moveTo(x, y)
+        else context.lineTo(x, y)
+      }
+
+      context.stroke()
+    }
+
+    function draw() {
+      const centerX = width / 2
+      const overlap = 8
+      const leftEnd = centerX - ringOuter + overlap
+      const rightStart = centerX + ringOuter - overlap
+
+      context.clearRect(0, 0, width, height)
+      drawWave(0, leftEnd, 'rgba(166, 255, 69, 0.9)', 'left')
+      drawWave(rightStart, width, 'rgba(255, 124, 117, 0.9)', 'right')
+
+      if (prefersReducedMotion) return
+
+      tick += 1
+      animationFrame = window.requestAnimationFrame(draw)
+    }
+
+    resize()
+    draw()
+
+    const resizeObserver = new ResizeObserver(() => resize())
+    resizeObserver.observe(waveFrame)
+    resizeObserver.observe(ringWrap)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.cancelAnimationFrame(animationFrame)
+    }
+  }, [])
+
+  return (
+    <div className="result-wave" aria-hidden="true">
+      <canvas ref={canvasRef} />
+    </div>
+  )
+}
+
 const goals = [
   { id: 'energy', title: 'Increase Energy', subtitle: 'Feel stronger and more productive throughout the day.', icon: 'energy' },
   { id: 'muscle', title: 'Build Muscle', subtitle: 'Gain lean muscle with smarter training and recovery.', icon: 'muscle' },
@@ -715,8 +861,7 @@ function ResultScreen({ profile, goal, activity, diet, onBack, onEnter }) {
       <ProgressHeader progress={100} onBack={onBack} title="Calorie Calculation" centerTitle rightLabel="Ready" />
       <div className="result-stage">
         <div className="result-ring-wrap">
-          <div className="heartbeat heartbeat--left" aria-hidden="true" />
-          <div className="heartbeat heartbeat--right heartbeat--warm" aria-hidden="true" />
+          <HeartbeatWave />
           <div className="result-ring" aria-hidden="true" />
         </div>
         <div className="result-copy">

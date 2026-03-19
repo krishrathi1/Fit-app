@@ -600,19 +600,35 @@
 
 .result-ring-wrap {
   position: relative;
-  width: min(70vw, 280px);
+  width: min(62vw, 248px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+  overflow: visible;
 }
 
 .result-ring {
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 1;
   border-radius: 50%;
-  background: conic-gradient(from 220deg, #a6ff45, #ffe28e, #ff7c75, #a6ff45);
+  background: conic-gradient(
+    from -92deg,
+    #8dff44 0deg,
+    #c7ff56 52deg,
+    #fff08b 116deg,
+    #ffd48f 178deg,
+    #ffac7f 236deg,
+    #ff8e79 286deg,
+    #8dff44 360deg
+  );
   mask: radial-gradient(circle, transparent 42%, #000 43%);
-  filter: blur(0.2px) drop-shadow(0 0 24px rgba(182, 255, 84, 0.26));
+  filter:
+    saturate(1.05)
+    blur(0.18px)
+    drop-shadow(0 0 18px rgba(182, 255, 84, 0.18))
+    drop-shadow(0 0 28px rgba(255, 142, 121, 0.12));
   animation: spin-ring 7s linear infinite;
 }
 
@@ -621,31 +637,38 @@
   to { transform: rotate(360deg); }
 }
 
-.heartbeat {
+.result-wave {
   position: absolute;
   top: 50%;
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(166, 255, 69, 0.38), transparent);
-  transform: translateY(-50%);
+  left: 50%;
+  width: calc(100% + 220px);
+  height: 160px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.heartbeat--left { left: -46px; }
-.heartbeat--right { right: -46px; }
-.heartbeat--warm { background: linear-gradient(90deg, transparent, rgba(255, 124, 117, 0.4), transparent); }
+.result-wave canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
 .result-copy {
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  align-items: center;
+  text-align: center;
 }
 
 .result-copy p {
   margin: 0;
   color: rgba(241, 244, 248, 0.88);
   font-size: 1.2rem;
+  line-height: 1.22;
 }
 
 .result-copy p:last-child {
@@ -1941,7 +1964,7 @@
   }
 
   .result-ring-wrap {
-    width: min(58vw, 220px);
+    width: min(54vw, 204px);
   }
 }
 
