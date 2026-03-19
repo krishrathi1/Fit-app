@@ -302,14 +302,19 @@ const mealSectionsSeed = [
     items: [{ id: 'meal-lunch-chicken', name: 'Grilled Chicken Plate', amount: '150g', calories: 412, protein: 46, carbs: 22, fats: 12 }],
   },
   {
+    id: 'snacks',
+    title: 'Snacks',
+    items: [{ id: 'meal-snacks-apple', name: 'Apple + Peanut Butter', amount: '1 serving', calories: 210, protein: 6, carbs: 24, fats: 10 }],
+  },
+  {
     id: 'dinner',
     title: 'Dinner',
     items: [{ id: 'meal-dinner-salmon', name: 'Salmon & Greens', amount: '1 plate', calories: 486, protein: 38, carbs: 19, fats: 24 }],
   },
   {
-    id: 'snacks',
-    title: 'Snacks',
-    items: [{ id: 'meal-snacks-apple', name: 'Apple + Peanut Butter', amount: '1 serving', calories: 210, protein: 6, carbs: 24, fats: 10 }],
+    id: 'other',
+    title: 'Other',
+    items: [],
   },
 ]
 
@@ -1343,7 +1348,115 @@ function DashboardNutritionLegacy({ mealSections, onOpenAddFood, onOpenFoodDetai
   )
 }
 
-function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail }) {
+function SwipeMealCard({ sectionId, item, onOpenFoodDetail, onDeleteMealItem, onDuplicateMealItem }) {
+  const [offset, setOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const startXRef = useRef(0)
+  const draggingRef = useRef(false)
+  const movedRef = useRef(false)
+  const offsetRef = useRef(0)
+  const actionTimeoutRef = useRef(null)
+  const maxOffset = 92
+  const triggerOffset = 68
+
+  useEffect(() => () => window.clearTimeout(actionTimeoutRef.current), [])
+
+  function beginSwipe(clientX) {
+    window.clearTimeout(actionTimeoutRef.current)
+    startXRef.current = clientX
+    draggingRef.current = true
+    movedRef.current = false
+    offsetRef.current = 0
+    setIsDragging(true)
+  }
+
+  function updateSwipe(clientX) {
+    if (!draggingRef.current) return
+    const nextOffset = Math.max(-maxOffset, Math.min(maxOffset, clientX - startXRef.current))
+    if (Math.abs(nextOffset) > 6) movedRef.current = true
+    offsetRef.current = nextOffset
+    setOffset(nextOffset)
+  }
+
+  function resetSwipe() {
+    offsetRef.current = 0
+    setOffset(0)
+    actionTimeoutRef.current = window.setTimeout(() => {
+      movedRef.current = false
+    }, 120)
+  }
+
+  function endSwipe() {
+    if (!draggingRef.current) return
+
+    draggingRef.current = false
+    setIsDragging(false)
+
+    if (offsetRef.current <= -triggerOffset) {
+      onDeleteMealItem(sectionId, item.id)
+      resetSwipe()
+      return
+    }
+
+    if (offsetRef.current >= triggerOffset) {
+      onDuplicateMealItem(sectionId, item.id)
+      resetSwipe()
+      return
+    }
+
+    resetSwipe()
+  }
+
+  function handleCardClick(event) {
+    if (movedRef.current) {
+      event.preventDefault()
+      event.stopPropagation()
+      movedRef.current = false
+      return
+    }
+
+    onOpenFoodDetail(item.detailFoodId ?? item, sectionId, 'hub')
+  }
+
+  return (
+    <div className="swipe-meal">
+      <div className="swipe-meal__action swipe-meal__action--copy" aria-hidden="true">
+        <Icon name="copy" />
+        <span>Copy</span>
+      </div>
+      <div className="swipe-meal__action swipe-meal__action--delete" aria-hidden="true">
+        <Icon name="trash" />
+        <span>Delete</span>
+      </div>
+      <article
+        className={`meal-card swipe-meal__card${isDragging ? ' is-dragging' : ''}`}
+        style={{ transform: `translateX(${offset}px)` }}
+        onPointerDown={(event) => {
+          if (event.pointerType === 'mouse' && event.button !== 0) return
+          event.currentTarget.setPointerCapture?.(event.pointerId)
+          beginSwipe(event.clientX)
+        }}
+        onPointerMove={(event) => updateSwipe(event.clientX)}
+        onPointerUp={endSwipe}
+        onPointerCancel={endSwipe}
+      >
+        <button className="meal-card__main meal-card__main--interactive" type="button" onClick={handleCardClick}>
+          <div>
+            <h4>{item.name}</h4>
+            <span>{item.amount}</span>
+          </div>
+          <div className="meal-card__calories">
+            <strong>{Math.round(item.calories)}</strong>
+            <span>kcal</span>
+            <b>{Math.round(item.protein)}g P</b>
+          </div>
+        </button>
+      </article>
+    </div>
+  )
+}
+
+function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail, onDeleteMealItem, onDuplicateMealItem }) {
   const weekDays = [
     { id: 'mon', label: 'Mon', date: 18 },
     { id: 'tue', label: 'Tue', date: 19, active: true, note: 'today' },
@@ -1355,27 +1468,6 @@ function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail }) {
   ]
 
   const consistency = ['hit', 'hit', 'miss', 'hit', 'miss', 'hit', 'hit']
-  const previewMap = { breakfast: 'breakfast', lunch: 'lunch', dinner: 'dinner', snacks: 'snacks' }
-
-  const mealCards = mealSections.map((section) => {
-    const totals = section.items.reduce((sum, item) => ({
-      calories: sum.calories + item.calories,
-      protein: sum.protein + item.protein,
-    }), { calories: 0, protein: 0 })
-    const latestItem = section.items[0] ?? null
-
-    return {
-      id: section.id,
-      title: section.title,
-      calories: totals.calories,
-      protein: totals.protein,
-      itemCount: section.items.length,
-      latestItem,
-      isEmpty: section.items.length === 0,
-      preview: latestItem?.detailFoodId ? (foodDetails[latestItem.detailFoodId]?.art ?? previewMap[section.id] ?? 'breakfast') : (previewMap[section.id] ?? 'breakfast'),
-    }
-  })
-
   return (
     <div className="dashboard-view dashboard-view--nutrition screen-fade">
       <header className="nutrition-header">
@@ -1397,39 +1489,46 @@ function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail }) {
       <section className="nutrition-section">
         <div className="nutrition-section__head">
           <h3>Today&apos;s Meals</h3>
+          <p>Add food to each meal and tap an item to see calories and details.</p>
         </div>
-        <div className="nutrition-meal-list">
-          {mealCards.map((meal) => (
-            meal.isEmpty ? (
-              <button key={meal.id} className="nutrition-meal-card nutrition-meal-card--empty" type="button" onClick={() => onOpenAddFood(meal.id)}>
-                <div className="meal-preview-art meal-preview-art--empty">
+        <div className="meal-sections">
+          {mealSections.map((section) => (
+            <section key={section.id} className="meal-section">
+              <div className="meal-section__header">
+                <div className="meal-section__heading">
+                  <h3>{section.title}</h3>
+                  <span>{section.items.length ? `${section.items.length} ${section.items.length === 1 ? 'item' : 'items'}` : 'No items yet'}</span>
+                </div>
+                <button type="button" onClick={() => onOpenAddFood(section.id)}>
                   <Icon name="plus" />
-                </div>
-                <div className="nutrition-meal-card__copy">
-                  <span className="nutrition-meal-card__title">Log Meal</span>
-                  <span className="nutrition-meal-card__sub">Add your {meal.title.toLowerCase()}</span>
-                </div>
-                <span className="nutrition-meal-card__meta">0 kcal / 0g P</span>
-              </button>
-            ) : (
-              <button
-                key={meal.id}
-                className="nutrition-meal-card"
-                type="button"
-                onClick={() => onOpenFoodDetail(meal.latestItem?.detailFoodId ?? meal.latestItem, meal.id, 'hub')}
-              >
-                <MealPreviewArt type={meal.preview} />
-                <div className="nutrition-meal-card__copy">
-                  <span className="nutrition-meal-card__title">{meal.latestItem?.name ?? meal.title}</span>
-                  <span className="nutrition-meal-card__sub">
-                    {meal.title}
-                    {meal.latestItem?.amount ? ` - ${meal.latestItem.amount}` : ''}
-                    {meal.itemCount > 1 ? ` - +${meal.itemCount - 1} more` : ''}
-                  </span>
-                </div>
-                <span className="nutrition-meal-card__meta">{meal.calories} kcal / {meal.protein}g P</span>
-              </button>
-            )
+                  <span>Add</span>
+                </button>
+              </div>
+              <div className="meal-section__list">
+                {section.items.length ? (
+                  section.items.map((item) => (
+                    <SwipeMealCard
+                      key={item.id}
+                      sectionId={section.id}
+                      item={item}
+                      onOpenFoodDetail={onOpenFoodDetail}
+                      onDeleteMealItem={onDeleteMealItem}
+                      onDuplicateMealItem={onDuplicateMealItem}
+                    />
+                  ))
+                ) : (
+                  <button className="meal-card meal-card--empty" type="button" onClick={() => onOpenAddFood(section.id)}>
+                    <div className="meal-card__placeholder">
+                      <Icon name="plus" />
+                    </div>
+                    <div className="meal-card__empty-copy">
+                      <h4>Log Meal</h4>
+                      <span>Add your {section.title.toLowerCase()} food</span>
+                    </div>
+                  </button>
+                )}
+              </div>
+            </section>
           ))}
         </div>
       </section>

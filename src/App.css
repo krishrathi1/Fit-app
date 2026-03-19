@@ -33,6 +33,10 @@
     max(16px, calc(env(safe-area-inset-top) + 8px)) 16px max(18px, env(safe-area-inset-bottom));
 }
 
+.phone-screen--dashboard {
+  height: 100dvh;
+}
+
 .phone-screen--flow {
   overflow-y: auto;
 }
@@ -773,7 +777,7 @@
 }
 
 .dashboard-shell {
-  height: calc(100dvh - max(16px, calc(env(safe-area-inset-top) + 8px)) - max(18px, env(safe-area-inset-bottom)));
+  height: 100%;
   min-height: 0;
   position: relative;
   display: flex;
@@ -791,7 +795,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: calc(132px + env(safe-area-inset-bottom));
+  padding-bottom: calc(124px + env(safe-area-inset-bottom));
 }
 
 .dashboard-scroll--immersive {
@@ -1868,6 +1872,18 @@
   background: linear-gradient(180deg, rgba(10, 14, 20, 0.94), rgba(10, 14, 20, 0.78));
 }
 
+.meal-section__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meal-section__heading span {
+  color: rgba(171, 181, 194, 0.7);
+  font-size: 0.72rem;
+  letter-spacing: -0.02em;
+}
+
 .meal-section__header h3,
 .meal-section__header button {
   margin: 0;
@@ -1880,10 +1896,19 @@
 }
 
 .meal-section__header button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 0;
   background: transparent;
   color: #96ff41;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.meal-section__header button svg {
+  width: 16px;
+  height: 16px;
 }
 
 .meal-section__list {
@@ -1893,9 +1918,98 @@
   margin-top: 8px;
 }
 
+.swipe-meal {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.swipe-meal__action {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.swipe-meal__action svg {
+  width: 18px;
+  height: 18px;
+}
+
+.swipe-meal__action--delete {
+  right: 0;
+  background: linear-gradient(180deg, rgba(255, 125, 113, 0.9), rgba(245, 97, 84, 0.9));
+}
+
+.swipe-meal__action--copy {
+  left: 0;
+  background: linear-gradient(180deg, rgba(150, 255, 65, 0.88), rgba(94, 223, 63, 0.9));
+  color: #081008;
+}
+
+.swipe-meal__card {
+  position: relative;
+  margin: 0;
+  transition: transform 0.22s ease;
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+.swipe-meal__card.is-dragging {
+  transition: none;
+}
+
 .meal-card {
   padding: 16px;
   border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(30, 34, 42, 0.94), rgba(22, 26, 32, 0.98)),
+    rgba(12, 18, 26, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 20px rgba(0, 0, 0, 0.14);
+}
+
+.meal-card--empty {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  font: inherit;
+  color: #fff;
+}
+
+.meal-card__placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(171, 181, 194, 0.78);
+}
+
+.meal-card__placeholder svg {
+  width: 18px;
+  height: 18px;
+}
+
+.meal-card__empty-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .meal-card__main {
@@ -1913,6 +2027,7 @@
   text-align: left;
   font: inherit;
   align-items: start;
+  cursor: pointer;
 }
 
 .meal-card__main--interactive:disabled {
@@ -1921,29 +2036,42 @@
 }
 
 .meal-card__main h4,
+.meal-card__empty-copy h4,
 .profile-summary h3 {
   margin: 0;
 }
 
+.meal-card__main h4,
+.meal-card__empty-copy h4 {
+  font-size: 1rem;
+}
+
 .meal-card__calories {
   text-align: right;
+  display: flex;
+  min-width: 74px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
 }
 
 .meal-card__calories strong,
 .fitness-grid strong {
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.08rem;
 }
 
 .meal-card__calories b {
   color: #2ec4ea;
   font-weight: 700;
+  font-size: 0.74rem;
 }
 
 .meal-card__actions {
   display: flex;
   gap: 10px;
   margin-top: 14px;
+  justify-content: flex-end;
 }
 
 .meal-card__actions button {
@@ -1953,6 +2081,11 @@
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
   color: #f3f6fb;
+}
+
+.meal-card__actions button svg {
+  width: 18px;
+  height: 18px;
 }
 
 .meal-card__actions .is-danger {
@@ -3080,18 +3213,18 @@
 
 .tab-bar {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: max(18px, calc(env(safe-area-inset-bottom) + 6px));
+  left: 12px;
+  right: 12px;
+  bottom: max(12px, calc(env(safe-area-inset-bottom) + 4px));
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
-  padding: 12px 10px max(12px, calc(env(safe-area-inset-bottom) + 2px));
+  padding: 12px 10px max(10px, calc(env(safe-area-inset-bottom) + 1px));
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 22px;
   background: rgba(18, 24, 32, 0.84);
   backdrop-filter: blur(20px);
-  z-index: 20;
+  z-index: 40;
   box-shadow:
     0 16px 32px rgba(0, 0, 0, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -3123,6 +3256,10 @@
   .phone-screen {
     min-height: min(932px, calc(100dvh - 48px));
     border-radius: 34px;
+  }
+
+  .phone-screen--dashboard {
+    height: min(932px, calc(100dvh - 48px));
   }
 }
 
