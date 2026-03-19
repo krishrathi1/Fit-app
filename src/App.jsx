@@ -883,8 +883,8 @@ function ResultScreen({ profile, goal, activity, diet, onBack, onEnter }) {
         </article>
       </div>
       <div className="sticky-footer">
-        <button className="primary-button" type="button" onClick={onEnter}>
-          Enter My OS
+        <button className="primary-button primary-button--shiny" type="button" onClick={onEnter}>
+          <span>Enter My OS</span>
         </button>
       </div>
     </div>
@@ -905,7 +905,6 @@ function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood }) {
     <div className="dashboard-view dashboard-view--home screen-fade">
       <header className="dashboard-header">
         <div>
-          <span className="dashboard-header__kicker">Good Morning</span>
           <h2>Good Morning,<br />Alex</h2>
         </div>
         <button className="avatar-badge" type="button"><span>A</span></button>

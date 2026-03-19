@@ -163,6 +163,7 @@
 .primary-button {
   width: 100%;
   min-height: 68px;
+  position: relative;
   border: 0;
   border-radius: 999px;
   background: linear-gradient(90deg, #a7ff39 0%, #b8ff47 50%, #98ff39 100%);
@@ -174,6 +175,50 @@
   box-shadow:
     0 18px 40px rgba(118, 255, 76, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.primary-button > span {
+  position: relative;
+  z-index: 2;
+}
+
+.primary-button--shiny {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.primary-button--shiny::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.38) 20%, transparent 40%);
+  animation: primary-button-shine 3s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.primary-button--shiny::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  filter: blur(10px);
+  opacity: 0.55;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes primary-button-shine {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .primary-button--hero {
@@ -1971,6 +2016,7 @@
 @media (prefers-reduced-motion: reduce) {
   .screen-fade,
   .result-ring,
+  .primary-button--shiny::before,
   .progress-fill,
   .macro-ring-chart__segment,
   .food-row__action.is-success {
