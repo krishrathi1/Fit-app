@@ -798,6 +798,17 @@
   padding-bottom: 0;
 }
 
+.dashboard-scroll--food-detail {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-scroll--food-detail > * {
+  flex: 1;
+  min-height: 0;
+}
+
 .dashboard-scroll--full-bleed {
   overflow: hidden;
 }
@@ -2161,28 +2172,34 @@
 }
 
 .food-detail {
-  gap: 24px;
-  padding-top: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 14px;
+  padding-top: 2px;
 }
 
 .food-detail__hero {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .food-detail__media {
   position: relative;
-  min-height: 280px;
+  min-height: 172px;
+  height: 172px;
   overflow: hidden;
-  border-radius: 30px;
+  border-radius: 24px;
   background: #080b11;
   box-shadow: 0 24px 40px rgba(0, 0, 0, 0.26);
 }
 
 .food-hero-art {
   width: 100%;
-  height: 280px;
+  height: 172px;
   display: block;
 }
 
@@ -2197,15 +2214,15 @@
 .food-detail__media-copy {
   position: absolute;
   z-index: 1;
-  left: 18px;
-  right: 18px;
-  bottom: 18px;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
 }
 
 .food-detail__media-copy h2 {
   margin: 0;
   color: #fff;
-  font-size: clamp(2rem, 8vw, 2.6rem);
+  font-size: clamp(1.45rem, 6vw, 1.9rem);
   line-height: 1;
   letter-spacing: -0.06em;
 }
@@ -2213,24 +2230,26 @@
 .food-detail__back {
   position: absolute;
   z-index: 1;
-  top: 16px;
-  left: 16px;
+  top: 14px;
+  left: 14px;
   backdrop-filter: blur(12px);
 }
 
 .portion-strip {
+  gap: 8px;
   padding: 0 2px;
 }
 
 .portion-strip__pill {
   flex: 0 0 auto;
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 34px;
+  padding: 0 12px;
   border: 0;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(221, 229, 237, 0.62);
   font: inherit;
+  font-size: 0.82rem;
   letter-spacing: -0.03em;
 }
 
@@ -2244,15 +2263,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
 }
 
 .macro-ring-card {
   position: relative;
-  width: min(72vw, 292px);
+  width: min(44vw, 176px);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+  flex-shrink: 0;
 }
 
 .macro-ring-chart {
@@ -2270,11 +2292,11 @@
 
 .macro-ring-chart__track {
   stroke: rgba(44, 58, 76, 0.92);
-  stroke-width: 24;
+  stroke-width: 16;
 }
 
 .macro-ring-chart__segment {
-  stroke-width: 24;
+  stroke-width: 16;
   transition: stroke-dasharray 0.28s ease, stroke-dashoffset 0.28s ease;
 }
 
@@ -2288,35 +2310,35 @@
 
 .macro-ring-card__center strong {
   color: #fff;
-  font-size: clamp(2.8rem, 12vw, 3.5rem);
+  font-size: clamp(1.8rem, 7vw, 2.3rem);
   letter-spacing: -0.08em;
   line-height: 0.92;
 }
 
 .macro-ring-card__center span {
-  margin-top: 6px;
+  margin-top: 4px;
   color: #eef2f7;
-  font-size: 1.08rem;
+  font-size: 0.84rem;
 }
 
 .macro-ring-card__center p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: rgba(206, 214, 224, 0.58);
-  font-size: 0.82rem;
+  font-size: 0.68rem;
 }
 
 .nutrition-grid {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .nutrition-card {
-  min-height: 72px;
-  padding: 14px 12px;
+  min-height: 52px;
+  padding: 10px 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  border-radius: 14px;
   background: linear-gradient(180deg, rgba(30, 42, 56, 0.94), rgba(21, 31, 44, 0.94));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   display: flex;
@@ -2326,15 +2348,15 @@
 
 .nutrition-card strong {
   color: #fff;
-  font-size: 1.65rem;
+  font-size: 1.08rem;
   line-height: 1;
   letter-spacing: -0.05em;
 }
 
 .nutrition-card span {
-  margin-top: 6px;
+  margin-top: 4px;
   color: rgba(220, 229, 237, 0.64);
-  font-size: 0.86rem;
+  font-size: 0.66rem;
 }
 
 .nutrition-card--protein {
@@ -2362,27 +2384,27 @@
 }
 
 .nutrition-card--wide {
-  grid-column: span 2;
+  grid-column: auto;
 }
 
 .food-detail__footer {
-  position: sticky;
-  bottom: calc(env(safe-area-inset-bottom) - 2px);
+  position: static;
   margin-top: auto;
-  padding: 18px 0 max(6px, env(safe-area-inset-bottom));
+  padding: 4px 0 max(4px, env(safe-area-inset-bottom));
   background: linear-gradient(180deg, rgba(7, 10, 17, 0) 0%, rgba(7, 10, 17, 0.94) 28%);
+  flex-shrink: 0;
 }
 
 .food-detail__footer p {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   color: #44d7f2;
   text-align: center;
-  font-size: 0.88rem;
+  font-size: 0.74rem;
 }
 
 .food-detail__cta {
-  min-height: 60px;
-  font-size: 1.35rem;
+  min-height: 46px;
+  font-size: 1rem;
 }
 
 .food-detail__cta--secondary {
@@ -3145,16 +3167,70 @@
 
   .food-detail__media,
   .food-hero-art {
-    min-height: 248px;
-    height: 248px;
-  }
-
-  .nutrition-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 160px;
+    height: 160px;
   }
 
   .nutrition-card--wide {
-    grid-column: 1 / -1;
+    grid-column: auto;
+  }
+}
+
+@media (max-height: 840px) {
+  .food-detail {
+    gap: 10px;
+    padding-top: 0;
+  }
+
+  .food-detail__hero {
+    gap: 8px;
+  }
+
+  .food-detail__media,
+  .food-hero-art {
+    min-height: 148px;
+    height: 148px;
+  }
+
+  .portion-strip__pill {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .macro-ring-card {
+    width: min(40vw, 160px);
+  }
+
+  .nutrition-grid {
+    gap: 6px;
+  }
+
+  .nutrition-card {
+    min-height: 48px;
+    padding: 8px 7px;
+  }
+
+  .nutrition-card strong {
+    font-size: 0.98rem;
+  }
+
+  .nutrition-card span {
+    font-size: 0.62rem;
+  }
+
+  .food-detail__footer {
+    padding-top: 2px;
+  }
+
+  .food-detail__footer p {
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+  }
+
+  .food-detail__cta {
+    min-height: 42px;
+    font-size: 0.94rem;
   }
 }
 

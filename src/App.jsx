@@ -2106,6 +2106,7 @@ function DashboardScreen({
 }) {
   let content = null
   const isImmersiveNutrition = activeTab === 'nutrition' && nutritionView !== 'hub'
+  const isFoodDetailNutrition = activeTab === 'nutrition' && nutritionView === 'food-detail'
   const isFullBleedNutrition = activeTab === 'nutrition' && ['scanner', 'recognition'].includes(nutritionView)
 
   if (activeTab === 'home') content = <DashboardHome profile={profile} goal={goal} activity={activity} onLogMeal={() => onOpenAddFood('breakfast')} onScanFood={() => onOpenRecognition('lunch')} onAddWorkout={() => onTabChange('fitness')} />
@@ -2145,7 +2146,7 @@ function DashboardScreen({
 
   return (
     <div className={`dashboard-shell${isImmersiveNutrition ? ' dashboard-shell--immersive' : ''}${isFullBleedNutrition ? ' dashboard-shell--full-bleed' : ''}`}>
-      <div className={`dashboard-scroll${isImmersiveNutrition ? ' dashboard-scroll--immersive' : ''}${isFullBleedNutrition ? ' dashboard-scroll--full-bleed' : ''}`}>{content}</div>
+      <div className={`dashboard-scroll${isImmersiveNutrition ? ' dashboard-scroll--immersive' : ''}${isFoodDetailNutrition ? ' dashboard-scroll--food-detail' : ''}${isFullBleedNutrition ? ' dashboard-scroll--full-bleed' : ''}`}>{content}</div>
       {!isImmersiveNutrition ? (
         <nav className="tab-bar" aria-label="Main app navigation">
           {dashboardTabs.map((tab) => (
