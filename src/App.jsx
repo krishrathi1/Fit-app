@@ -369,6 +369,49 @@ const foodDetails = {
   },
 }
 
+function pickFoodArt(name = '') {
+  const normalized = name.toLowerCase()
+
+  if (normalized.includes('bar')) return 'bar'
+
+  return 'toast'
+}
+
+function buildLoggedFoodDetail(item) {
+  const protein = item.protein ?? 0
+  const carbs = item.carbs ?? 0
+  const fats = item.fats ?? 0
+  const calories = item.calories ?? 0
+  const fiber = item.fiber ?? Math.max(2, Math.round(carbs * 0.16))
+  const iron = item.iron ?? Math.max(1, Math.round(protein * 0.08))
+  const sodium = item.sodium ?? Math.max(90, Math.round(calories * 1.1))
+
+  return {
+    id: item.detailFoodId ?? `logged-${item.id}`,
+    name: item.name,
+    art: pickFoodArt(item.name),
+    insight: protein >= 24
+      ? 'Strong protein coverage for this meal.'
+      : fiber >= 8
+        ? 'Solid fiber support for digestion and fullness.'
+        : 'A balanced log with a clear macro breakdown.',
+    portions: [
+      {
+        id: 'logged-serving',
+        label: item.amount ?? '1 Serving',
+        amount: item.amount ?? '1 serving',
+        calories,
+        protein,
+        carbs,
+        fats,
+        fiber,
+        iron,
+        sodium,
+      },
+    ],
+  }
+}
+
 const recognitionItemsSeed = [
   { id: 'recognition-chicken', name: 'Chicken Breast', amount: '150g est.', calories: 247, protein: 46, carbs: 0, fats: 5, ringX: 104, ringY: 200 },
   { id: 'recognition-rice', name: 'White Rice', amount: '100g est.', calories: 130, protein: 3, carbs: 28, fats: 0, ringX: 220, ringY: 356 },
@@ -1092,13 +1135,17 @@ function DashboardNutritionUnused({ mealSections, onOpenAddFood }) {
       calories: sum.calories + item.calories,
       protein: sum.protein + item.protein,
     }), { calories: 0, protein: 0 })
+    const latestItem = section.items[0] ?? null
 
     return {
       id: section.id,
       title: section.title,
       calories: totals.calories,
       protein: totals.protein,
-      preview: previewMap[section.id] ?? 'breakfast',
+      itemCount: section.items.length,
+      latestItem,
+      isEmpty: section.items.length === 0,
+      preview: latestItem?.detailFoodId ? (foodDetails[latestItem.detailFoodId]?.art ?? previewMap[section.id] ?? 'breakfast') : (previewMap[section.id] ?? 'breakfast'),
     }
   })
 
@@ -1215,7 +1262,7 @@ function MealPreviewArt({ type }) {
   )
 }
 
-function DashboardNutrition({ mealSections, onOpenAddFood }) {
+function DashboardNutritionLegacy({ mealSections, onOpenAddFood, onOpenFoodDetail }) {
   const weekDays = [
     { id: 'mon', label: 'Mon', date: 18 },
     { id: 'tue', label: 'Tue', date: 19, active: true, note: 'today' },
@@ -1273,6 +1320,112 @@ function DashboardNutrition({ mealSections, onOpenAddFood }) {
               <span className="nutrition-meal-card__title">{meal.title}</span>
               <span className="nutrition-meal-card__meta">{meal.calories} kcal • {meal.protein}g P</span>
             </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="nutrition-section nutrition-section--consistency">
+        <div className="nutrition-section__head">
+          <h3>Consistency</h3>
+          <p>7-day nutrition target streak</p>
+        </div>
+        <div className="consistency-grid" role="list" aria-label="Weekly nutrition consistency">
+          {consistency.map((state, index) => (
+            <span key={`${state}-${index}`} className={`consistency-grid__cell consistency-grid__cell--${state}`} role="listitem" />
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail }) {
+  const weekDays = [
+    { id: 'mon', label: 'Mon', date: 18 },
+    { id: 'tue', label: 'Tue', date: 19, active: true, note: 'today' },
+    { id: 'wed', label: 'Wed', date: 20 },
+    { id: 'thu', label: 'Thu', date: 21 },
+    { id: 'fri', label: 'Fri', date: 22 },
+    { id: 'sat', label: 'Sat', date: 23 },
+    { id: 'sun', label: 'Sun', date: 24 },
+  ]
+
+  const consistency = ['hit', 'hit', 'miss', 'hit', 'miss', 'hit', 'hit']
+  const previewMap = { breakfast: 'breakfast', lunch: 'lunch', dinner: 'dinner', snacks: 'snacks' }
+
+  const mealCards = mealSections.map((section) => {
+    const totals = section.items.reduce((sum, item) => ({
+      calories: sum.calories + item.calories,
+      protein: sum.protein + item.protein,
+    }), { calories: 0, protein: 0 })
+    const latestItem = section.items[0] ?? null
+
+    return {
+      id: section.id,
+      title: section.title,
+      calories: totals.calories,
+      protein: totals.protein,
+      itemCount: section.items.length,
+      latestItem,
+      isEmpty: section.items.length === 0,
+      preview: latestItem?.detailFoodId ? (foodDetails[latestItem.detailFoodId]?.art ?? previewMap[section.id] ?? 'breakfast') : (previewMap[section.id] ?? 'breakfast'),
+    }
+  })
+
+  return (
+    <div className="dashboard-view dashboard-view--nutrition screen-fade">
+      <header className="nutrition-header">
+        <div>
+          <h2>Nutrition</h2>
+        </div>
+        <button className="calendar-button" type="button"><Icon name="calendar" /></button>
+      </header>
+      <div className="nutrition-week-strip" role="list" aria-label="Week overview">
+        {weekDays.map((day) => (
+          <button key={day.id} className={`nutrition-week-day${day.active ? ' is-active' : ''}`} type="button" role="listitem">
+            <span>{day.label}</span>
+            <strong>{day.date}</strong>
+            {day.note ? <em>{day.note}</em> : null}
+          </button>
+        ))}
+      </div>
+
+      <section className="nutrition-section">
+        <div className="nutrition-section__head">
+          <h3>Today&apos;s Meals</h3>
+        </div>
+        <div className="nutrition-meal-list">
+          {mealCards.map((meal) => (
+            meal.isEmpty ? (
+              <button key={meal.id} className="nutrition-meal-card nutrition-meal-card--empty" type="button" onClick={() => onOpenAddFood(meal.id)}>
+                <div className="meal-preview-art meal-preview-art--empty">
+                  <Icon name="plus" />
+                </div>
+                <div className="nutrition-meal-card__copy">
+                  <span className="nutrition-meal-card__title">Log Meal</span>
+                  <span className="nutrition-meal-card__sub">Add your {meal.title.toLowerCase()}</span>
+                </div>
+                <span className="nutrition-meal-card__meta">0 kcal / 0g P</span>
+              </button>
+            ) : (
+              <button
+                key={meal.id}
+                className="nutrition-meal-card"
+                type="button"
+                onClick={() => onOpenFoodDetail(meal.latestItem?.detailFoodId ?? meal.latestItem, meal.id, 'hub')}
+              >
+                <MealPreviewArt type={meal.preview} />
+                <div className="nutrition-meal-card__copy">
+                  <span className="nutrition-meal-card__title">{meal.latestItem?.name ?? meal.title}</span>
+                  <span className="nutrition-meal-card__sub">
+                    {meal.title}
+                    {meal.latestItem?.amount ? ` - ${meal.latestItem.amount}` : ''}
+                    {meal.itemCount > 1 ? ` - +${meal.itemCount - 1} more` : ''}
+                  </span>
+                </div>
+                <span className="nutrition-meal-card__meta">{meal.calories} kcal / {meal.protein}g P</span>
+              </button>
+            )
           ))}
         </div>
       </section>
@@ -1489,7 +1642,7 @@ function RecognitionScreen({ onBack, onConfirm }) {
   )
 }
 
-function FoodDetailScreen({ food, selectedPortionId, onSelectPortion, onBack, onLogFood }) {
+function FoodDetailScreen({ food, selectedPortionId, onSelectPortion, onBack, onLogFood, showLogButton = true }) {
   const activePortion = food?.portions.find((portion) => portion.id === selectedPortionId) ?? food?.portions[0]
 
   if (!food || !activePortion) return null
@@ -1551,9 +1704,15 @@ function FoodDetailScreen({ food, selectedPortionId, onSelectPortion, onBack, on
 
       <div className="food-detail__footer">
         <p>{insight}</p>
-        <button className="primary-button food-detail__cta" type="button" onClick={onLogFood}>
-          Log Food
-        </button>
+        {showLogButton ? (
+          <button className="primary-button food-detail__cta" type="button" onClick={onLogFood}>
+            Log Food
+          </button>
+        ) : (
+          <button className="primary-button food-detail__cta food-detail__cta--secondary" type="button" onClick={onBack}>
+            Back to Meals
+          </button>
+        )}
       </div>
     </div>
   )
@@ -1891,6 +2050,7 @@ function DashboardScreen({
   diet,
   mealSections,
   nutritionView,
+  nutritionReturnView,
   selectedFood,
   selectedPortionId,
   onSelectPortion,
@@ -1920,15 +2080,16 @@ function DashboardScreen({
     } else if (nutritionView === 'recognition') {
       content = <RecognitionScreen onBack={onCloseRecognitionFlow} onConfirm={onConfirmRecognition} />
     } else if (nutritionView === 'food-detail') {
-      content = (
-        <FoodDetailScreen
-          food={selectedFood}
-          selectedPortionId={selectedPortionId}
-          onSelectPortion={onSelectPortion}
-          onBack={onCloseNutritionFlow}
-          onLogFood={onLogFood}
-        />
-      )
+        content = (
+          <FoodDetailScreen
+            food={selectedFood}
+            selectedPortionId={selectedPortionId}
+            onSelectPortion={onSelectPortion}
+            onBack={onCloseNutritionFlow}
+            onLogFood={onLogFood}
+            showLogButton={nutritionReturnView !== 'hub'}
+          />
+        )
     } else {
       content = (
         <DashboardNutrition
@@ -1974,6 +2135,7 @@ function App() {
   const [nutritionTargetSectionId, setNutritionTargetSectionId] = useState('breakfast')
   const [nutritionReturnView, setNutritionReturnView] = useState('hub')
   const [selectedFoodId, setSelectedFoodId] = useState('avocado-toast-egg')
+  const [selectedFoodData, setSelectedFoodData] = useState(null)
   const [selectedPortionId, setSelectedPortionId] = useState('one-slice')
   const timeoutRef = useRef(null)
   const mealEntryRef = useRef(0)
@@ -2021,6 +2183,7 @@ function App() {
       carbs: food.carbs,
       fats: food.fats,
       fiber: food.fiber,
+      iron: food.iron,
       sodium: food.sodium,
       detailFoodId,
     }
@@ -2068,13 +2231,16 @@ function App() {
     setActiveTab('home')
   }
 
-  function openFoodDetail(foodId, sectionId = nutritionTargetSectionId, returnView = 'hub') {
-    const detail = foodDetails[foodId] ?? foodDetails['avocado-toast-egg']
+  function openFoodDetail(foodIdOrMeal, sectionId = nutritionTargetSectionId, returnView = 'hub') {
+    const detail = typeof foodIdOrMeal === 'string'
+      ? (foodDetails[foodIdOrMeal] ?? foodDetails['avocado-toast-egg'])
+      : buildLoggedFoodDetail(foodIdOrMeal)
     const defaultPortion = detail.portions.find((portion) => portion.id === 'one-slice')?.id ?? detail.portions.find((portion) => portion.id === 'one-bar')?.id ?? detail.portions[0]?.id
 
     setActiveTab('nutrition')
     setNutritionTargetSectionId(sectionId ?? 'breakfast')
     setNutritionReturnView(returnView)
+    setSelectedFoodData(typeof foodIdOrMeal === 'string' ? null : detail)
     setSelectedFoodId(detail.id)
     setSelectedPortionId(defaultPortion)
     setNutritionView('food-detail')
@@ -2082,15 +2248,18 @@ function App() {
 
   function closeNutritionFlow() {
     if (nutritionView === 'food-detail' && nutritionReturnView === 'addFood') {
+      setSelectedFoodData(null)
       setNutritionView('addFood')
       return
     }
 
     if (nutritionView === 'food-detail' && nutritionReturnView === 'scanner') {
+      setSelectedFoodData(null)
       setNutritionView('scanner')
       return
     }
 
+    setSelectedFoodData(null)
     setNutritionView('hub')
   }
 
@@ -2099,11 +2268,12 @@ function App() {
   }
 
   function handleLogFood() {
-    const food = foodDetails[selectedFoodId] ?? foodDetails['avocado-toast-egg']
+    const food = selectedFoodData ?? foodDetails[selectedFoodId] ?? foodDetails['avocado-toast-egg']
     const portion = food.portions.find((item) => item.id === selectedPortionId) ?? food.portions[0]
 
     insertMealEntry(nutritionTargetSectionId, createMealEntry({ ...portion, name: food.name }, food.id))
     setNutritionView('hub')
+    setSelectedFoodData(null)
   }
 
   function handleConfirmRecognition(items) {
@@ -2150,7 +2320,7 @@ function App() {
 
   const screenClass = `phone-screen ${screen === 'welcome' ? 'phone-screen--welcome' : screen === 'dashboard' ? 'phone-screen--dashboard' : 'phone-screen--flow'
     }`
-  const selectedFood = foodDetails[selectedFoodId] ?? foodDetails['avocado-toast-egg']
+  const selectedFood = selectedFoodData ?? foodDetails[selectedFoodId] ?? foodDetails['avocado-toast-egg']
 
   return (
     <main className="app-shell">
@@ -2175,6 +2345,7 @@ function App() {
             diet={diet}
             mealSections={mealSections}
             nutritionView={nutritionView}
+            nutritionReturnView={nutritionReturnView}
             selectedFood={selectedFood}
             selectedPortionId={selectedPortionId}
             onSelectPortion={setSelectedPortionId}

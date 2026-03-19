@@ -1662,6 +1662,17 @@
   font: inherit;
 }
 
+.nutrition-meal-card--empty {
+  border-style: dashed;
+}
+
+.nutrition-meal-card__copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .meal-preview-art {
   width: 48px;
   height: 48px;
@@ -1689,6 +1700,15 @@
   font-size: 1rem;
   font-weight: 500;
   letter-spacing: -0.03em;
+}
+
+.nutrition-meal-card__sub {
+  color: rgba(171, 181, 194, 0.8);
+  font-size: 0.76rem;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nutrition-meal-card__meta {
@@ -2263,6 +2283,12 @@
 .food-detail__cta {
   min-height: 60px;
   font-size: 1.35rem;
+}
+
+.food-detail__cta--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f3f6fb;
+  box-shadow: none;
 }
 
 .scanner-screen,
