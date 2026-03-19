@@ -976,55 +976,144 @@ function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood }) {
   )
 }
 
-function DashboardNutrition({ mealSections, onOpenAddFood, onOpenFoodDetail, onDuplicateMealItem, onDeleteMealItem }) {
+function MealPreviewArt({ type }) {
+  if (type === 'lunch') {
+    return (
+      <svg className="meal-preview-art" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="mealLunchBg" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#1f2937" />
+            <stop offset="100%" stopColor="#0f1720" />
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="18" fill="url(#mealLunchBg)" />
+        <circle cx="32" cy="32" r="22" fill="#f7fafc" />
+        <circle cx="24" cy="28" r="7" fill="#8fd267" />
+        <circle cx="39" cy="27" r="8" fill="#d97d52" />
+        <ellipse cx="31" cy="39" rx="13" ry="6.5" fill="#72b95f" />
+        <circle cx="41" cy="38" r="5" fill="#f3d068" />
+      </svg>
+    )
+  }
+
+  if (type === 'dinner') {
+    return (
+      <svg className="meal-preview-art" viewBox="0 0 64 64" aria-hidden="true">
+        <defs>
+          <linearGradient id="mealDinnerBg" x1="0%" x2="100%" y1="0%" y2="100%">
+            <stop offset="0%" stopColor="#1f2937" />
+            <stop offset="100%" stopColor="#111827" />
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="18" fill="url(#mealDinnerBg)" />
+        <circle cx="32" cy="32" r="22" fill="#f7fafc" />
+        <ellipse cx="26" cy="30" rx="9" ry="13" fill="#7fb264" />
+        <ellipse cx="40" cy="29" rx="7" ry="11" fill="#6c4a37" />
+        <path d="M33 18c7 2 10 8 8 16" stroke="#ecb36d" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+        <path d="M19 41c7-2 13-2 24 0" stroke="#a3d57a" strokeWidth="3" strokeLinecap="round" fill="none" />
+      </svg>
+    )
+  }
+
+  if (type === 'snacks') {
+    return (
+      <div className="meal-preview-art meal-preview-art--empty">
+        <Icon name="plus" />
+      </div>
+    )
+  }
+
+  return (
+    <svg className="meal-preview-art" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <linearGradient id="mealBreakfastBg" x1="0%" x2="100%" y1="0%" y2="100%">
+          <stop offset="0%" stopColor="#202a36" />
+          <stop offset="100%" stopColor="#101720" />
+        </linearGradient>
+      </defs>
+      <rect width="64" height="64" rx="18" fill="url(#mealBreakfastBg)" />
+      <circle cx="32" cy="32" r="22" fill="#f8fafc" />
+      <ellipse cx="27" cy="32" rx="10" ry="7" fill="#8bcd63" />
+      <ellipse cx="37" cy="28" rx="7" ry="6" fill="#f0cf6b" />
+      <circle cx="40" cy="28" r="3.5" fill="#f7b731" />
+      <path d="M19 39c7-2 13-1 24 2" stroke="#7db65b" strokeWidth="3" strokeLinecap="round" fill="none" />
+    </svg>
+  )
+}
+
+function DashboardNutrition({ mealSections, onOpenAddFood }) {
+  const weekDays = [
+    { id: 'mon', label: 'Mon', date: 18 },
+    { id: 'tue', label: 'Tue', date: 19, active: true, note: 'today' },
+    { id: 'wed', label: 'Wed', date: 20 },
+    { id: 'thu', label: 'Thu', date: 21 },
+    { id: 'fri', label: 'Fri', date: 22 },
+    { id: 'sat', label: 'Sat', date: 23 },
+    { id: 'sun', label: 'Sun', date: 24 },
+  ]
+
+  const consistency = ['hit', 'hit', 'miss', 'hit', 'miss', 'hit', 'hit']
+  const previewMap = { breakfast: 'breakfast', lunch: 'lunch', dinner: 'dinner', snacks: 'snacks' }
+
+  const mealCards = mealSections.map((section) => {
+    const totals = section.items.reduce((sum, item) => ({
+      calories: sum.calories + item.calories,
+      protein: sum.protein + item.protein,
+    }), { calories: 0, protein: 0 })
+
+    return {
+      id: section.id,
+      title: section.title,
+      calories: totals.calories,
+      protein: totals.protein,
+      preview: previewMap[section.id] ?? 'breakfast',
+    }
+  })
+
   return (
     <div className="dashboard-view dashboard-view--nutrition screen-fade">
       <header className="nutrition-header">
         <div>
-          <h2>Today, Mar 19</h2>
-          <p>Plan meals, review macros, and make fast edits.</p>
+          <h2>Nutrition</h2>
         </div>
         <button className="calendar-button" type="button"><Icon name="calendar" /></button>
       </header>
-      <div className="meal-sections">
-        {mealSections.map((section) => (
-          <section key={section.id} className="meal-section">
-            <div className="meal-section__header">
-              <h3>{section.title}</h3>
-              <button type="button" onClick={() => onOpenAddFood(section.id)}>+ Add</button>
-            </div>
-            <div className="meal-section__list">
-              {section.items.map((item) => (
-                <article key={item.id} className="meal-card">
-                  <button
-                    className={`meal-card__main meal-card__main--interactive${item.detailFoodId ? '' : ' is-static'}`}
-                    type="button"
-                    onClick={() => item.detailFoodId && onOpenFoodDetail(item.detailFoodId, section.id, 'hub')}
-                    disabled={!item.detailFoodId}
-                  >
-                    <div>
-                      <h4>{item.name}</h4>
-                      <span>{item.amount}</span>
-                    </div>
-                    <div className="meal-card__calories">
-                      <strong>{item.calories} kcal</strong>
-                      <span><b>{item.protein}g P</b> / {item.carbs}g C / {item.fats}g F</span>
-                    </div>
-                  </button>
-                  <div className="meal-card__actions">
-                    <button type="button" onClick={() => onDuplicateMealItem(section.id, item.id)} aria-label={`Duplicate ${item.name}`}>
-                      <Icon name="copy" />
-                    </button>
-                    <button type="button" className="is-danger" onClick={() => onDeleteMealItem(section.id, item.id)} aria-label={`Delete ${item.name}`}>
-                      <Icon name="trash" />
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+      <div className="nutrition-week-strip" role="list" aria-label="Week overview">
+        {weekDays.map((day) => (
+          <button key={day.id} className={`nutrition-week-day${day.active ? ' is-active' : ''}`} type="button" role="listitem">
+            <span>{day.label}</span>
+            <strong>{day.date}</strong>
+            {day.note ? <em>{day.note}</em> : null}
+          </button>
         ))}
       </div>
+
+      <section className="nutrition-section">
+        <div className="nutrition-section__head">
+          <h3>Today&apos;s Meals</h3>
+        </div>
+        <div className="nutrition-meal-list">
+          {mealCards.map((meal) => (
+            <button key={meal.id} className="nutrition-meal-card" type="button" onClick={() => onOpenAddFood(meal.id)}>
+              <MealPreviewArt type={meal.preview} />
+              <span className="nutrition-meal-card__title">{meal.title}</span>
+              <span className="nutrition-meal-card__meta">{meal.calories} kcal • {meal.protein}g P</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="nutrition-section nutrition-section--consistency">
+        <div className="nutrition-section__head">
+          <h3>Consistency</h3>
+          <p>7-day nutrition target streak</p>
+        </div>
+        <div className="consistency-grid" role="list" aria-label="Weekly nutrition consistency">
+          {consistency.map((state, index) => (
+            <span key={`${state}-${index}`} className={`consistency-grid__cell consistency-grid__cell--${state}`} role="listitem" />
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

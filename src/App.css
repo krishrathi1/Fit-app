@@ -782,7 +782,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-bottom: 92px;
+  padding-bottom: 116px;
 }
 
 .dashboard-scroll--immersive {
@@ -812,6 +812,18 @@
 .tab-header h2,
 .nutrition-header h2 {
   font-size: clamp(2rem, 8vw, 3rem);
+}
+
+.dashboard-view--nutrition {
+  gap: 18px;
+}
+
+.nutrition-header {
+  align-items: center;
+}
+
+.nutrition-header p {
+  margin-top: 6px;
 }
 
 .avatar-badge {
@@ -995,6 +1007,166 @@
   gap: 8px;
   font: inherit;
   font-size: 0.82rem;
+}
+
+.nutrition-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.nutrition-week-day {
+  min-height: 68px;
+  padding: 10px 0 8px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: rgba(171, 181, 194, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font: inherit;
+  letter-spacing: -0.02em;
+}
+
+.nutrition-week-day span {
+  font-size: 0.68rem;
+}
+
+.nutrition-week-day strong {
+  font-size: 0.96rem;
+  color: #dfe6ee;
+}
+
+.nutrition-week-day em {
+  font-style: normal;
+  font-size: 0.62rem;
+  color: #98ff39;
+}
+
+.nutrition-week-day.is-active {
+  background: linear-gradient(180deg, rgba(108, 108, 170, 0.68), rgba(77, 86, 146, 0.5));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 22px rgba(63, 72, 129, 0.26);
+}
+
+.nutrition-week-day.is-active strong {
+  color: #fff;
+}
+
+.nutrition-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nutrition-section__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nutrition-section__head h3 {
+  margin: 0;
+  color: rgba(245, 248, 252, 0.94);
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+}
+
+.nutrition-section__head p {
+  margin: 0;
+  color: rgba(165, 175, 189, 0.72);
+  font-size: 0.76rem;
+}
+
+.nutrition-meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nutrition-meal-card {
+  width: 100%;
+  min-height: 76px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(30, 34, 42, 0.94), rgba(22, 26, 32, 0.98)),
+    rgba(12, 18, 26, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 12px 20px rgba(0, 0, 0, 0.14);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font: inherit;
+}
+
+.meal-preview-art {
+  width: 48px;
+  height: 48px;
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.meal-preview-art--empty {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  place-items: center;
+  color: rgba(171, 181, 194, 0.76);
+}
+
+.meal-preview-art--empty svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nutrition-meal-card__title {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.nutrition-meal-card__meta {
+  color: rgba(156, 163, 175, 0.82);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.nutrition-section--consistency {
+  padding-bottom: 6px;
+}
+
+.consistency-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.consistency-grid__cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.consistency-grid__cell--hit {
+  background: linear-gradient(180deg, #bcff47, #98ff39);
+  box-shadow: 0 0 14px rgba(152, 255, 57, 0.18);
+}
+
+.consistency-grid__cell--miss {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .meal-sections {
@@ -1965,17 +2137,20 @@
 
 .tab-bar {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 10px;
+  right: 10px;
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 6px));
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
-  padding: 10px 8px;
+  padding: 12px 10px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  background: rgba(18, 24, 32, 0.88);
-  backdrop-filter: blur(16px);
+  border-radius: 22px;
+  background: rgba(18, 24, 32, 0.84);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .tab-bar__item {
