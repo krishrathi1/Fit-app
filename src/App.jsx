@@ -895,6 +895,10 @@ function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood }) {
   const targetCalories = calculateTargetCalories(profile, goal, activity)
   const consumedCalories = Math.round(targetCalories * 0.84)
   const macros = calculateMacros(targetCalories, goal)
+  const calorieProgress = Math.min(consumedCalories / targetCalories, 1)
+  const calorieRingRadius = 54
+  const calorieRingCircumference = 2 * Math.PI * calorieRingRadius
+  const calorieRingOffset = calorieRingCircumference * (1 - calorieProgress)
   const progressRows = [
     ['Protein', Math.round(macros.protein * 0.82), macros.protein, 'protein'],
     ['Carbs', Math.round(macros.carbs * 0.9), macros.carbs, 'carbs'],
@@ -910,20 +914,44 @@ function DashboardHome({ profile, goal, activity, onLogMeal, onScanFood }) {
         <button className="avatar-badge" type="button"><span>A</span></button>
       </header>
       <article className="dashboard-card dashboard-card--summary">
-        <div className="calorie-ring">
-          <div className="calorie-ring__inner">
-            <strong>{consumedCalories}</strong>
-            <span>/ {targetCalories} kcal</span>
-          </div>
+        <div className="summary-card__top">
+          <span>Calories</span>
+          <span>Macro Breakdown</span>
         </div>
-        <div className="macro-breakdown">
-          <h3>Macro Breakdown</h3>
-          {progressRows.map(([label, value, total, tone]) => (
-            <div key={label} className="macro-breakdown__row">
-              <div className="macro-breakdown__labels"><span>{label}</span><span>{value}/{total}g</span></div>
-              <div className="macro-breakdown__track"><div className={`macro-breakdown__fill macro-breakdown__fill--${tone}`} style={{ width: `${(value / total) * 100}%` }} /></div>
+        <div className="summary-card__content">
+          <div className="calorie-ring">
+            <svg className="calorie-ring__svg" viewBox="0 0 128 128" aria-hidden="true">
+              <defs>
+                <linearGradient id="homeCalorieRingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#22d3ee" />
+                  <stop offset="100%" stopColor="#8dff44" />
+                </linearGradient>
+              </defs>
+              <circle className="calorie-ring__track" cx="64" cy="64" r={calorieRingRadius} />
+              <circle
+                className="calorie-ring__progress"
+                cx="64"
+                cy="64"
+                r={calorieRingRadius}
+                style={{
+                  strokeDasharray: calorieRingCircumference,
+                  strokeDashoffset: calorieRingOffset,
+                }}
+              />
+            </svg>
+            <div className="calorie-ring__inner">
+              <strong>{consumedCalories}</strong>
+              <span>/ {targetCalories} kcal</span>
             </div>
-          ))}
+          </div>
+          <div className="macro-breakdown">
+            {progressRows.map(([label, value, total, tone]) => (
+              <div key={label} className="macro-breakdown__row">
+                <div className="macro-breakdown__labels"><span>{label}</span><span>{value}/{total}g</span></div>
+                <div className="macro-breakdown__track"><div className={`macro-breakdown__fill macro-breakdown__fill--${tone}`} style={{ width: `${(value / total) * 100}%` }} /></div>
+              </div>
+            ))}
+          </div>
         </div>
       </article>
       <article className="dashboard-card">

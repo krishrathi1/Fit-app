@@ -835,40 +835,97 @@
 }
 
 .dashboard-card--summary {
-  display: grid;
-  grid-template-columns: 140px 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
+  padding: 18px 18px 20px;
+  border-color: rgba(99, 130, 164, 0.22);
+  background:
+    linear-gradient(180deg, rgba(34, 49, 69, 0.94), rgba(24, 36, 50, 0.96)),
+    rgba(12, 18, 26, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+.summary-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: rgba(240, 244, 248, 0.82);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.summary-card__content {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 18px;
+  align-items: center;
 }
 
 .calorie-ring {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at center, rgba(12, 18, 26, 0.95) 48%, transparent 49%),
-    conic-gradient(#96ff41 0 68%, #2ec4ea 68% 84%, rgba(255,255,255,0.12) 84% 100%);
+  position: relative;
+  width: 128px;
+  height: 128px;
   display: grid;
   place-items: center;
 }
 
+.calorie-ring__svg {
+  width: 128px;
+  height: 128px;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.calorie-ring__track,
+.calorie-ring__progress {
+  fill: none;
+  stroke-width: 10;
+}
+
+.calorie-ring__track {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
+.calorie-ring__progress {
+  stroke: url(#homeCalorieRingGradient);
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 14px rgba(141, 255, 68, 0.18));
+}
+
 .calorie-ring__inner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
   text-align: center;
 }
 
 .calorie-ring__inner strong {
   display: block;
   color: #fff;
-  font-size: 2rem;
+  font-size: 2.05rem;
   line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.calorie-ring__inner span {
+  display: block;
+  margin-top: 3px;
+  color: rgba(214, 224, 236, 0.66);
+  font-size: 0.72rem;
+  line-height: 1.2;
 }
 
 .macro-breakdown {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.macro-breakdown h3,
 .dashboard-card h3,
 .nutrition-header h2,
 .tab-header h2 {
@@ -881,15 +938,23 @@
   justify-content: space-between;
   gap: 12px;
   color: rgba(231, 236, 243, 0.8);
-  font-size: 0.92rem;
+  font-size: 0.82rem;
+}
+
+.macro-breakdown__labels span:first-child {
+  color: rgba(240, 244, 248, 0.9);
+}
+
+.macro-breakdown__labels span:last-child {
+  color: rgba(165, 175, 189, 0.92);
 }
 
 .macro-breakdown__track,
 .fitness-track {
-  height: 8px;
+  height: 7px;
   border-radius: 999px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .macro-breakdown__fill,
