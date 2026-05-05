@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model UserProfile {
+  id           String   @id @default(cuid())
+  name         String   @default("User")
+  gender       String   @default("male")
+  age          Int      @default(25)
+  weight       Float    @default(70)
+  height       Float    @default(170)
+  activityLevel String  @default("moderate")
+  goal         String   @default("weight_loss")
+  diet         String   @default("balanced")
+  targetCalories Int    @default(2000)
+  targetProtein  Float  @default(150)
+  targetCarbs    Float  @default(200)
+  targetFats     Float  @default(65)
+  onboarded    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model MealLog {
+  id          String   @id @default(cuid())
+  mealType    String   // breakfast, lunch, dinner, snack
+  foodName    String
+  calories    Int
+  protein     Float
+  carbs       Float
+  fats        Float
+  servingSize Float    @default(1)
+  servingUnit String   @default("serving")
+  date        String   // YYYY-MM-DD
+  createdAt   DateTime @default(now())
+}
+
+model WaterLog {
+  id        String   @id @default(cuid())
+  amount    Int      // ml
+  date      String   // YYYY-MM-DD
+  createdAt DateTime @default(now())
+}
+
+model WorkoutLog {
+  id          String   @id @default(cuid())
+  name        String
+  type        String
+  duration    Int      // minutes
+  caloriesBurned Int
+  exercises   String   // JSON string
+  date        String   // YYYY-MM-DD
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String   // user, assistant
+  content   String
+  createdAt DateTime @default(now())
+}
