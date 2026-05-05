@@ -20,6 +20,7 @@ export interface FoodItem {
   servingSize: number;
   servingUnit: string;
   category?: string;
+  emoji?: string;
 }
 
 export interface MealEntry {
@@ -59,6 +60,15 @@ export interface Workout {
   caloriesBurned: number;
 }
 
+export interface Achievement {
+  id: string;
+  title: string;
+  desc: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedAt?: number;
+}
+
 export interface AppState {
   // Navigation
   screen: Screen;
@@ -87,6 +97,15 @@ export interface AppState {
   currentWorkout: Workout | null;
   workoutTimer: number;
   isWorkoutActive: boolean;
+  
+  // Streaks & Gamification
+  streak: number;
+  longestStreak: number;
+  xp: number;
+  level: number;
+  achievements: Achievement[];
+  completedWorkouts: number;
+  totalCaloriesBurned: number;
   
   // AI Coach
   chatMessages: ChatMessage[];
@@ -123,6 +142,10 @@ export interface AppState {
   toggleSetComplete: (exerciseId: string, setIndex: number) => void;
   updateSetWeight: (exerciseId: string, setIndex: number, weight: number) => void;
   updateSetReps: (exerciseId: string, setIndex: number, reps: number) => void;
+  completeWorkout: (caloriesBurned: number) => void;
+  
+  addXp: (amount: number) => void;
+  unlockAchievement: (id: string) => void;
   
   addChatMessage: (message: ChatMessage) => void;
   setIsChatLoading: (loading: boolean) => void;
@@ -132,9 +155,24 @@ export interface AppState {
   setSelectedMealType: (mealType: string) => void;
 }
 
+const DEFAULT_ACHIEVEMENTS: Achievement[] = [
+  { id: 'first_meal', title: 'First Bite', desc: 'Log your first meal', icon: '🍽️', unlocked: false },
+  { id: 'first_workout', title: 'First Rep', desc: 'Complete your first workout', icon: '🏋️', unlocked: false },
+  { id: 'streak_3', title: 'On Fire', desc: '3-day streak', icon: '🔥', unlocked: false },
+  { id: 'streak_7', title: 'Unstoppable', desc: '7-day streak', icon: '⚡', unlocked: false },
+  { id: 'streak_30', title: 'Machine', desc: '30-day streak', icon: '🤖', unlocked: false },
+  { id: 'protein_hit', title: 'Protein Pro', desc: 'Hit protein target 5 days', icon: '🥩', unlocked: false },
+  { id: 'water_goal', title: 'Hydration Hero', desc: 'Hit water goal 3 days', icon: '💧', unlocked: false },
+  { id: 'calories_5', title: 'Calorie King', desc: 'Hit calorie target 5 days', icon: '👑', unlocked: false },
+  { id: 'workout_10', title: 'Iron Will', desc: 'Complete 10 workouts', icon: '💪', unlocked: false },
+  { id: 'coach_chat', title: 'Coach Buddy', desc: 'Chat with AI Coach', icon: '🤖', unlocked: false },
+  { id: 'level_5', title: 'Rising Star', desc: 'Reach Level 5', icon: '⭐', unlocked: false },
+  { id: 'level_10', title: 'Fitness Legend', desc: 'Reach Level 10', icon: '🌟', unlocked: false },
+];
+
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       // Navigation
       screen: 'welcome',
       dashboardTab: 'home',
@@ -162,6 +200,15 @@ export const useAppStore = create<AppState>()(
       currentWorkout: null,
       workoutTimer: 0,
       isWorkoutActive: false,
+      
+      // Streaks & Gamification
+      streak: 0,
+      longestStreak: 0,
+      xp: 0,
+      level: 1,
+      achievements: DEFAULT_ACHIEVEMENTS,
+      completedWorkouts: 0,
+      totalCaloriesBurned: 0,
       
       // AI Coach
       chatMessages: [],
@@ -192,12 +239,20 @@ export const useAppStore = create<AppState>()(
         targetFats: fats,
         targetWater: water,
       }),
-      completeOnboarding: () => set({ onboarded: true, screen: 'dashboard' }),
+      completeOnboarding: () => set({ onboarded: true, screen: 'dashboard', streak: 1 }),
       
       // Meal actions
-      addMeal: (meal) => set((state) => ({ meals: [...state.meals, meal] })),
+      addMeal: (meal) => set((state) => {
+        const newMeals = [...state.meals, meal];
+        const unlocked = [...state.achievements];
+        if (state.meals.length === 0) {
+          const idx = unlocked.findIndex(a => a.id === 'first_meal');
+          if (idx >= 0 && !unlocked[idx].unlocked) unlocked[idx] = { ...unlocked[idx], unlocked: true, unlockedAt: Date.now() };
+        }
+        return { meals: newMeals, achievements: unlocked, xp: state.xp + 10 };
+      }),
       removeMeal: (id) => set((state) => ({ meals: state.meals.filter(m => m.id !== id) })),
-      addWater: (ml) => set((state) => ({ waterIntake: state.waterIntake + ml })),
+      addWater: (ml) => set((state) => ({ waterIntake: state.waterIntake + ml, xp: state.xp + 5 })),
       resetWater: () => set({ waterIntake: 0 }),
       
       // Workout actions
@@ -237,9 +292,56 @@ export const useAppStore = create<AppState>()(
         });
         return { currentWorkout: { ...state.currentWorkout, exercises: updatedExercises } };
       }),
+      completeWorkout: (caloriesBurned) => set((state) => {
+        const newCompleted = state.completedWorkouts + 1;
+        const newTotal = state.totalCaloriesBurned + caloriesBurned;
+        const unlocked = [...state.achievements];
+        if (newCompleted === 1) {
+          const idx = unlocked.findIndex(a => a.id === 'first_workout');
+          if (idx >= 0 && !unlocked[idx].unlocked) unlocked[idx] = { ...unlocked[idx], unlocked: true, unlockedAt: Date.now() };
+        }
+        if (newCompleted >= 10) {
+          const idx = unlocked.findIndex(a => a.id === 'workout_10');
+          if (idx >= 0 && !unlocked[idx].unlocked) unlocked[idx] = { ...unlocked[idx], unlocked: true, unlockedAt: Date.now() };
+        }
+        const newXp = state.xp + 50;
+        const newLevel = Math.floor(newXp / 200) + 1;
+        if (newLevel >= 5) {
+          const idx = unlocked.findIndex(a => a.id === 'level_5');
+          if (idx >= 0 && !unlocked[idx].unlocked) unlocked[idx] = { ...unlocked[idx], unlocked: true, unlockedAt: Date.now() };
+        }
+        return { 
+          completedWorkouts: newCompleted, 
+          totalCaloriesBurned: newTotal, 
+          xp: newXp, 
+          level: newLevel,
+          achievements: unlocked,
+          currentWorkout: null 
+        };
+      }),
+      
+      // Gamification
+      addXp: (amount) => set((state) => {
+        const newXp = state.xp + amount;
+        const newLevel = Math.floor(newXp / 200) + 1;
+        return { xp: newXp, level: newLevel };
+      }),
+      unlockAchievement: (id) => set((state) => {
+        const unlocked = state.achievements.map(a => 
+          a.id === id && !a.unlocked ? { ...a, unlocked: true, unlockedAt: Date.now() } : a
+        );
+        return { achievements: unlocked };
+      }),
       
       // Chat actions
-      addChatMessage: (message) => set((state) => ({ chatMessages: [...state.chatMessages, message] })),
+      addChatMessage: (message) => set((state) => {
+        const unlocked = [...state.achievements];
+        if (state.chatMessages.length === 0) {
+          const idx = unlocked.findIndex(a => a.id === 'coach_chat');
+          if (idx >= 0 && !unlocked[idx].unlocked) unlocked[idx] = { ...unlocked[idx], unlocked: true, unlockedAt: Date.now() };
+        }
+        return { chatMessages: [...state.chatMessages, message], achievements: unlocked };
+      }),
       setIsChatLoading: (loading) => set({ isChatLoading: loading }),
       clearChat: () => set({ chatMessages: [] }),
       
@@ -267,6 +369,13 @@ export const useAppStore = create<AppState>()(
         meals: state.meals,
         waterIntake: state.waterIntake,
         chatMessages: state.chatMessages,
+        streak: state.streak,
+        longestStreak: state.longestStreak,
+        xp: state.xp,
+        level: state.level,
+        achievements: state.achievements,
+        completedWorkouts: state.completedWorkouts,
+        totalCaloriesBurned: state.totalCaloriesBurned,
       }),
     }
   )

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Send, Sparkles, Bot, User, Trash2, Loader2,
-  Dumbbell, Apple, Moon, Droplets
+  Dumbbell, Apple, Moon, Droplets, Zap
 } from 'lucide-react';
 
 export function AICoachPage() {
@@ -23,7 +23,7 @@ export function AICoachPage() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [store.chatMessages]);
+  }, [store.chatMessages, isSending]);
 
   const handleSend = async (message?: string) => {
     const msg = message || input.trim();
@@ -67,17 +67,19 @@ export function AICoachPage() {
       };
       store.addChatMessage(assistantMessage);
     } catch {
-      const errorMessage: ChatMessage = {
+      const fallbackMessage: ChatMessage = {
         id: `msg_${Date.now()}_err`,
         role: 'assistant',
         content: "I'm having trouble connecting right now. Please try again in a moment. In the meantime, remember to stay hydrated and keep pushing! 💪",
         timestamp: Date.now(),
       };
-      store.addChatMessage(errorMessage);
+      store.addChatMessage(fallbackMessage);
     } finally {
       setIsSending(false);
     }
   };
+
+  const isEmpty = store.chatMessages.length === 0;
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
@@ -89,7 +91,7 @@ export function AICoachPage() {
           </div>
           <div>
             <h2 className="text-lg font-bold">AI Coach</h2>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-emerald animate-pulse" />
               <span className="text-xs text-muted-foreground">Online</span>
             </div>
@@ -105,45 +107,71 @@ export function AICoachPage() {
         </Button>
       </div>
 
-      {/* Coach Overview */}
-      {store.chatMessages.length === 0 && (
-        <Card className="p-4 border-border bg-gradient-to-r from-emerald/10 to-cyan/10 mb-4">
-          <div className="flex items-center gap-3 mb-3">
-            <Sparkles className="w-5 h-5 text-emerald" />
-            <span className="font-semibold text-sm">Your Personal Coach</span>
-          </div>
-          <p className="text-xs text-muted-foreground mb-3">
-            I know your goals and can help with nutrition, workouts, recovery, and motivation. Ask me anything!
-          </p>
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { icon: Dumbbell, label: 'Workouts', color: 'text-emerald' },
-              { icon: Apple, label: 'Nutrition', color: 'text-orange-400' },
-              { icon: Moon, label: 'Recovery', color: 'text-violet-400' },
-              { icon: Droplets, label: 'Hydration', color: 'text-cyan-400' },
-            ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center gap-1 p-2 rounded-lg bg-card/50">
-                <item.icon className={`w-4 h-4 ${item.color}`} />
-                <span className="text-xs">{item.label}</span>
+      {/* Empty State - Coach Overview */}
+      {isEmpty && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <Card className="glass-card p-5 mb-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-            ))}
-          </div>
-        </Card>
+              <div>
+                <span className="font-semibold text-sm">Your Personal AI Coach</span>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  I know your goals and can help with nutrition, workouts, recovery, and motivation. Ask me anything!
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 gap-2 mt-4">
+              {[
+                { icon: Dumbbell, label: 'Workouts', color: 'text-emerald', bg: 'bg-emerald/10' },
+                { icon: Apple, label: 'Nutrition', color: 'text-orange-400', bg: 'bg-orange-400/10' },
+                { icon: Moon, label: 'Recovery', color: 'text-violet-400', bg: 'bg-violet-400/10' },
+                { icon: Droplets, label: 'Hydration', color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 + i * 0.08 }}
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-card/50 hover-lift cursor-default"
+                >
+                  <div className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center`}>
+                    <item.icon className={`w-4 h-4 ${item.color}`} />
+                  </div>
+                  <span className="text-[11px] font-medium text-muted-foreground">{item.label}</span>
+                </motion.div>
+              ))}
+            </div>
+          </Card>
+        </motion.div>
       )}
 
       {/* Quick Prompts */}
-      {store.chatMessages.length === 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {QUICK_PROMPTS.map((prompt) => (
-            <button
+      {isEmpty && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          className="flex flex-wrap gap-2 mb-4"
+        >
+          {QUICK_PROMPTS.map((prompt, i) => (
+            <motion.button
               key={prompt}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.35 + i * 0.05 }}
               onClick={() => handleSend(prompt)}
-              className="px-3 py-1.5 rounded-full bg-card border border-border text-xs hover:border-emerald/30 hover:bg-emerald/5 transition-all"
+              className="px-3.5 py-1.5 rounded-full glass-card text-xs font-medium hover:border-emerald/30 hover:bg-emerald/5 transition-all press-effect"
             >
               {prompt}
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
       )}
 
       {/* Messages */}
@@ -152,11 +180,12 @@ export function AICoachPage() {
           {store.chatMessages.map((msg, i) => (
             <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i === store.chatMessages.length - 1 ? 0.05 : 0 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`flex items-start gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-start gap-2.5 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
                   msg.role === 'user' ? 'bg-cyan/20' : 'bg-gradient-to-br from-emerald-500 to-cyan-500'
                 }`}>
@@ -166,10 +195,10 @@ export function AICoachPage() {
                     <Bot className="w-3.5 h-3.5 text-white" />
                   )}
                 </div>
-                <div className={`p-3 rounded-2xl text-sm ${
+                <div className={`p-3 text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-cyan/10 rounded-tr-sm'
-                    : 'bg-card border border-border rounded-tl-sm'
+                    ? 'bg-cyan/10 rounded-2xl rounded-tr-sm'
+                    : 'glass-card rounded-2xl rounded-tl-sm'
                 }`}>
                   {msg.content}
                 </div>
@@ -178,20 +207,25 @@ export function AICoachPage() {
           ))}
           {isSending && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
               className="flex justify-start"
             >
-              <div className="flex items-center gap-2 p-3 rounded-2xl bg-card border border-border rounded-tl-sm">
-                <Loader2 className="w-4 h-4 animate-spin text-emerald" />
-                <span className="text-sm text-muted-foreground">Thinking...</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div className="flex items-center gap-2 p-3 glass-card rounded-2xl rounded-tl-sm">
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald" />
+                  <span className="text-sm text-muted-foreground">Thinking...</span>
+                </div>
               </div>
             </motion.div>
           )}
         </div>
       </ScrollArea>
 
-      {/* Input */}
+      {/* Input Bar */}
       <div className="pt-3 border-t border-border">
         <form
           onSubmit={(e) => { e.preventDefault(); handleSend(); }}
@@ -200,7 +234,7 @@ export function AICoachPage() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask your coach..."
+            placeholder="Ask your coach anything..."
             className="rounded-xl bg-card border-border"
             disabled={isSending}
           />
@@ -208,7 +242,7 @@ export function AICoachPage() {
             type="submit"
             size="icon"
             disabled={!input.trim() || isSending}
-            className="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white border-0 hover:from-emerald-600 hover:to-cyan-600"
+            className="btn-gradient rounded-xl flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>

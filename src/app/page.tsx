@@ -20,10 +20,10 @@ function DashboardContent() {
     <AnimatePresence mode="wait">
       <motion.div
         key={dashboardTab}
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.2 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.25, ease: 'easeInOut' }}
       >
         {dashboardTab === 'home' && <HomeDashboard />}
         {dashboardTab === 'nutrition' && <NutritionPage />}
@@ -48,20 +48,25 @@ export default function Home() {
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center animate-pulse">
-          <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="mesh-bg" />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center"
+        >
+          <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
-  // If onboarding is complete, show dashboard
   if (onboarded || screen === 'dashboard') {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="max-w-lg mx-auto px-4 pt-4 pb-24">
+      <div className="min-h-screen bg-background relative">
+        <div className="mesh-bg" />
+        <div className="relative max-w-lg mx-auto px-4 pt-4 pb-24">
           <DashboardContent />
         </div>
         <BottomNav />
@@ -69,6 +74,12 @@ export default function Home() {
     );
   }
 
-  // Otherwise, show onboarding
-  return <OnboardingFlow />;
+  return (
+    <div className="min-h-screen bg-background relative">
+      <div className="mesh-bg" />
+      <div className="relative">
+        <OnboardingFlow />
+      </div>
+    </div>
+  );
 }
